@@ -1,11 +1,11 @@
+<template>
+  <router-link :to="{ path: '/notebook'}">跳转到目标</router-link>
+</template>
+
 <script setup>
 
 </script>
 
-<template>
-home
-</template>
-
-<style scoped lang="scss">
+<style scoped>
 
 </style>
