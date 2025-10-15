@@ -14,6 +14,7 @@
     "@tiptap/extension-underline": "^3.6.5",
     "@tiptap/starter-kit": "^3.6.5",
     "@tiptap/vue-3": "^3.6.5",
+    "ant-design-vue": "^4.2.6",
     "pinia": "^3.0.3",
     "vue": "^3.5.21",
     "vue-router": "4"
