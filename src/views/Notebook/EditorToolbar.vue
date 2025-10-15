@@ -124,12 +124,12 @@ const lineHeights = ['1', '1.5', '1.8', '2', '2.5', '3']
       </template>
     </Dropdown>
 
-    <button type="button" @click="editor.chain().focus().toggleBold().run()" :class="{ active: editor.isActive('bold') }"><b>B</b></button>
-    <button type="button" @click="editor.chain().focus().toggleItalic().run()" :class="{ active: editor.isActive('italic') }"><i>I</i></button>
-    <button type="button" @click="editor.chain().focus().toggleUnderline().run()" :class="{ active: editor.isActive('underline') }"><u>U</u></button>
-    <button type="button" @click="editor.chain().focus().toggleStrike().run()" :class="{ active: editor.isActive('strike') }">S</button>
+    <button type="button" @click="editor.chain().focus().toggleBold().run()" :class="{ active: editor.isActive('bold') }" title="加粗"><b>B</b></button>
+    <button type="button" @click="editor.chain().focus().toggleItalic().run()" :class="{ active: editor.isActive('italic') }" title="斜体"><i>I</i></button>
+    <button type="button" @click="editor.chain().focus().toggleUnderline().run()" :class="{ active: editor.isActive('underline') }" title="下划线"><u>U</u></button>
+    <button type="button" @click="editor.chain().focus().toggleStrike().run()" :class="{ active: editor.isActive('strike') }" title="删除线">S</button>
 
-    <button type="button" @click="editor.chain().focus().toggleTaskList().run()" :class="{ active: editor.isActive('taskList') }" title="任务列表">
+    <button type="button" @click="editor.chain().focus().toggleTaskList().run()" :class="{ active: editor.isActive('taskList') }" title="可勾选框">
       <CheckSquareOutlined />
     </button>
     <button type="button" @click="editor.chain().focus().toggleBulletList().run()" :class="{ active: editor.isActive('bulletList') }" title="无序列表">
@@ -180,11 +180,17 @@ const lineHeights = ['1', '1.5', '1.8', '2', '2.5', '3']
   flex: 1;
 }
 .toolbar button {
-  /* 你可能需要从全局样式或 NoteArea.vue 中移动一些按钮的基础样式过来 */
+  background: transparent;
+  border: 1px solid transparent;
+}
+.toolbar button:hover {
+  background: #f5f5f5;
+  border-color: #e5e5e5;
 }
 .toolbar button.active {
   background: #e6f7ff;
   border-color: #91d5ff;
+  color: #1890ff;
 }
 
 /* 图标水平翻转 */
