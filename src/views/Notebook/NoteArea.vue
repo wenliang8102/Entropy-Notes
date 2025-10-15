@@ -1,13 +1,15 @@
 <script setup>
-import { onBeforeUnmount } from 'vue'
+import { onBeforeUnmount ,ref} from 'vue'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
-
 import { Dropdown, Menu, MenuItem } from 'ant-design-vue'
 import { DownOutlined, UnorderedListOutlined, OrderedListOutlined, RollbackOutlined } from '@ant-design/icons-vue'
 
+//保存标题信息
+const documentTitle = ref('')
+// 初始化编辑器
 const editor = useEditor({
   extensions: [
     StarterKit.configure({
@@ -75,6 +77,16 @@ const blockTypes = [
 
 <template>
   <div class="note-area">
+    <!-- 文档标题框 -->
+    <div class="title-wrapper">
+      <input
+          type="text"
+          class="document-title-input"
+          placeholder="请输入标题"
+          v-model="documentTitle"
+      />
+    </div>
+
     <div class="toolbar" v-if="editor">
       <!--多级标题 -->
       <Dropdown>
@@ -132,6 +144,27 @@ const blockTypes = [
   min-width: 0;
 }
 
+/* 为标题区域和输入框添加样式 */
+.title-wrapper {
+  padding: 16px 20px 8px; /* 调整内边距 */
+  border-bottom: 1px solid #ececec;
+}
+
+.document-title-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 2em; /* 放大字体 */
+  font-weight: 600; /* 加粗 */
+  color: #213547;
+  box-sizing: border-box;
+}
+
+.document-title-input::placeholder {
+  color: #adb5bd;
+}
+
 .toolbar {
   display: flex;
   gap: 6px;
@@ -176,9 +209,6 @@ const blockTypes = [
   pointer-events: none;
 }
 
-.editor :deep(h1) { font-size: 1.8rem; margin: 1rem 0; }
-.editor :deep(h2) { font-size: 1.4rem; margin: 0.8rem 0; }
-.editor :deep(p)  { line-height: 1.8; }
 
 /* 高亮当前菜单项 */
 :deep(.ant-dropdown-menu-item.active) {
