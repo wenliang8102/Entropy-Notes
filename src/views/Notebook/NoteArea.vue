@@ -5,6 +5,8 @@ import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
 
+import { Dropdown, Menu, MenuItem } from 'ant-design-vue'
+import { DownOutlined } from '@ant-design/icons-vue'
 
 const editor = useEditor({
   extensions: [
@@ -24,19 +26,82 @@ const editor = useEditor({
 onBeforeUnmount(() => {
   editor?.value?.destroy()
 })
+
+//多级标题配置
+const blockTypes = [
+  {
+    label: '正文',
+    isActive: () => editor.value?.isActive('paragraph'),
+    command: () => editor.value?.chain().focus().setParagraph().run(),
+  },
+  {
+    label: 'H1',
+    level: 1,
+    isActive: () => editor.value?.isActive('heading', { level: 1 }),
+    command: () => editor.value?.chain().focus().toggleHeading({ level: 1 }).run(),
+  },
+  {
+    label: 'H2',
+    level: 2,
+    isActive: () => editor.value?.isActive('heading', { level: 2 }),
+    command: () => editor.value?.chain().focus().toggleHeading({ level: 2 }).run(),
+  },
+  {
+    label: 'H3',
+    level: 3,
+    isActive: () => editor.value?.isActive('heading', { level: 3 }),
+    command: () => editor.value?.chain().focus().toggleHeading({ level: 3 }).run(),
+  },
+  {
+    label: 'H4',
+    level: 4,
+    isActive: () => editor.value?.isActive('heading', { level: 4 }),
+    command: () => editor.value?.chain().focus().toggleHeading({ level: 4 }).run(),
+  },
+  {
+    label: 'H5',
+    level: 5,
+    isActive: () => editor.value?.isActive('heading', { level: 5 }),
+    command: () => editor.value?.chain().focus().toggleHeading({ level: 5 }).run(),
+  },
+  {
+    label: 'H6',
+    level: 6,
+    isActive: () => editor.value?.isActive('heading', { level: 6 }),
+    command: () => editor.value?.chain().focus().toggleHeading({ level: 6 }).run(),
+  },
+]
 </script>
 
 <template>
   <div class="note-area">
     <div class="toolbar" v-if="editor">
+      <!--多级标题 -->
+      <Dropdown>
+        <template #default>
+          <button type="button">
+            {{blockTypes.find((it) => it.isActive())?.label || '正文' }}
+            <DownOutlined />
+          </button>
+        </template>
+        <template #overlay>
+          <Menu>
+            <MenuItem
+                v-for="type in blockTypes"
+                :key="type.label"
+                :class="{ active: type.isActive() }"
+                @click="type.command"
+            >
+              {{ type.label }}
+            </MenuItem>
+          </Menu>
+        </template>
+      </Dropdown>
+
       <button type="button" @click="editor.chain().focus().toggleBold().run()" :class="{ active: editor.isActive('bold') }"><b>B</b></button>
       <button type="button" @click="editor.chain().focus().toggleItalic().run()" :class="{ active: editor.isActive('italic') }"><i>I</i></button>
       <button type="button" @click="editor.chain().focus().toggleUnderline().run()" :class="{ active: editor.isActive('underline') }"><u>U</u></button>
       <button type="button" @click="editor.chain().focus().toggleStrike().run()" :class="{ active: editor.isActive('strike') }">S</button>
-
-      <button type="button" @click="editor.chain().focus().setParagraph().run()">正文</button>
-      <button type="button" @click="editor.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ active: editor.isActive('heading', { level: 1 }) }">H1</button>
-      <button type="button" @click="editor.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ active: editor.isActive('heading', { level: 2 }) }">H2</button>
 
       <button type="button" @click="editor.chain().focus().toggleBulletList().run()" :class="{ active: editor.isActive('bulletList') }">• 列表</button>
       <button type="button" @click="editor.chain().focus().toggleOrderedList().run()" :class="{ active: editor.isActive('orderedList') }">1. 列表</button>
@@ -99,4 +164,13 @@ onBeforeUnmount(() => {
 .editor :deep(h1) { font-size: 1.8rem; margin: 1rem 0; }
 .editor :deep(h2) { font-size: 1.4rem; margin: 0.8rem 0; }
 .editor :deep(p)  { line-height: 1.8; }
+
+/* 高亮当前菜单项 */
+:deep(.ant-dropdown-menu-item.active) {
+  background: #e6f7ff;
+  color: #1890ff;
+  font-weight: bold;
+}
+
+
 </style>
