@@ -4,8 +4,24 @@ import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
+import TaskList from '@tiptap/extension-task-list'
+import TaskItem from '@tiptap/extension-task-item'
+import TextAlign from '@tiptap/extension-text-align'
+import  LineHeight  from 'tiptap-extension-line-height'
+import FontFamily from '@tiptap/extension-font-family'
 import { Dropdown, Menu, MenuItem } from 'ant-design-vue'
-import { DownOutlined, UnorderedListOutlined, OrderedListOutlined, RollbackOutlined } from '@ant-design/icons-vue'
+import {
+  DownOutlined, // 下拉箭头图标
+  UnorderedListOutlined, // 无序列表图标
+  OrderedListOutlined, // 有序列表图标
+  RollbackOutlined, // 撤销重做图标
+  CheckSquareOutlined, // 任务列表图标
+  AlignCenterOutlined, // 居中对齐图标
+  AlignLeftOutlined,   // 左对齐图标
+  AlignRightOutlined,  // 右对齐图标
+  MenuUnfoldOutlined,  // 用于两端对齐
+  LineHeightOutlined,  // 用于行高
+} from '@ant-design/icons-vue'
 
 //保存标题信息
 const documentTitle = ref('')
@@ -20,6 +36,17 @@ const editor = useEditor({
       placeholder: '开始编辑...'
     }),
     Underline,
+    // 添加任务列表扩展
+    TaskList,
+    TaskItem.configure({
+      nested: true, // 允许嵌套任务列表
+    }),
+    // 添加文本对齐扩展
+    TextAlign.configure({
+      types: ['heading', 'paragraph'], // 应用于标题和段落
+    }),
+    //行高
+    LineHeight,
   ],
   content: '<p></p>',
   autofocus: 'end',
@@ -73,6 +100,17 @@ const blockTypes = [
     command: () => editor.value?.chain().focus().toggleHeading({ level: 6 }).run(),
   },
 ]
+
+const alignTypes = [
+  { label: '左对齐', value: 'left', icon: AlignLeftOutlined, command: () => editor.value?.chain().focus().setTextAlign('left').run() },
+  { label: '居中对齐', value: 'center', icon: AlignCenterOutlined, command: () => editor.value?.chain().focus().setTextAlign('center').run() },
+  { label: '右对齐', value: 'right', icon: AlignRightOutlined, command: () => editor.value?.chain().focus().setTextAlign('right').run() },
+  { label: '两端对齐', value: 'justify', icon: MenuUnfoldOutlined, command: () => editor.value?.chain().focus().setTextAlign('justify').run() },
+]
+
+// 行高配置
+const lineHeights = ['1', '1.5', '1.8', '2', '2.5', '3']
+
 </script>
 
 <template>
@@ -110,17 +148,59 @@ const blockTypes = [
         </template>
       </Dropdown>
 
+      <!--行高-->
+      <Dropdown>
+        <template #default>
+          <button type="button" title="行高">
+            <LineHeightOutlined />
+            <DownOutlined />
+          </button>
+        </template>
+        <template #overlay>
+          <Menu>
+            <MenuItem
+                v-for="lh in lineHeights"
+                :key="lh"
+                @click="editor.chain().focus().setLineHeight(lh).run()"
+                :class="{ active: editor.isActive({ lineHeight: lh }) }"
+            >
+              {{ lh }}
+            </MenuItem>
+          </Menu>
+        </template>
+      </Dropdown>
+
       <button type="button" @click="editor.chain().focus().toggleBold().run()" :class="{ active: editor.isActive('bold') }"><b>B</b></button>
       <button type="button" @click="editor.chain().focus().toggleItalic().run()" :class="{ active: editor.isActive('italic') }"><i>I</i></button>
       <button type="button" @click="editor.chain().focus().toggleUnderline().run()" :class="{ active: editor.isActive('underline') }"><u>U</u></button>
       <button type="button" @click="editor.chain().focus().toggleStrike().run()" :class="{ active: editor.isActive('strike') }">S</button>
 
+      <button type="button" @click="editor.chain().focus().toggleTaskList().run()" :class="{ active: editor.isActive('taskList') }" title="任务列表">
+        <CheckSquareOutlined />
+      </button>
       <button type="button" @click="editor.chain().focus().toggleBulletList().run()" :class="{ active: editor.isActive('bulletList') }" title="无序列表">
         <UnorderedListOutlined />
       </button>
       <button type="button" @click="editor.chain().focus().toggleOrderedList().run()" :class="{ active: editor.isActive('orderedList') }" title="有序列表">
         <OrderedListOutlined />
       </button>
+
+      <!-- 文本对齐 -->
+      <Dropdown>
+        <template #default>
+          <button type="button">
+            <component :is="alignTypes.find(a => editor.isActive({ textAlign: a.value }))?.icon || AlignLeftOutlined" />
+            <DownOutlined />
+          </button>
+        </template>
+        <template #overlay>
+          <Menu>
+            <MenuItem v-for="align in alignTypes" :key="align.value" @click="align.command">
+              <component :is="align.icon" /> {{ align.label }}
+            </MenuItem>
+          </Menu>
+        </template>
+      </Dropdown>
 
       <span class="spacer"></span>
 
@@ -201,12 +281,11 @@ const blockTypes = [
   outline: none;
 }
 
-.editor :deep(.ProseMirror p.is-editor-empty:first-child::before) {
-  content: attr(data-placeholder);
-  color: #adb5bd;
-  float: left;
-  height: 0;
-  pointer-events: none;
+/* 5. 移除之前行高的全局样式，并修改默认行高 */
+.editor :deep(p) {
+  /* 默认行高由 ProseMirror 控制，或由扩展设置 */
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 
@@ -216,6 +295,29 @@ const blockTypes = [
   color: #1890ff;
   font-weight: bold;
 }
+
+/* 8. 添加任务列表和行高的样式 */
+.editor :deep(ul[data-type="taskList"]) {
+  list-style: none;
+  padding: 0;
+}
+.editor :deep(ul[data-type="taskList"] li) {
+  display: flex;
+  align-items: center;
+}
+.editor :deep(ul[data-type="taskList"] li > label) {
+  flex: 0 0 auto;
+  margin-right: 0.5rem;
+  user-select: none;
+}
+.editor :deep(ul[data-type="taskList"] li > div) {
+  flex: 1 1 auto;
+}
+.editor :deep(ul[data-type="taskList"] li[data-checked="true"] > div > p) {
+  text-decoration: line-through;
+  color: #adb5bd;
+}
+
 
 
 </style>

@@ -11,9 +11,24 @@ importers:
       '@ant-design/icons-vue':
         specifier: ^7.0.1
         version: 7.0.1(vue@3.5.22(typescript@5.9.2))
+      '@tiptap/extension-font-family':
+        specifier: ^3.7.0
+        version: 3.7.0(@tiptap/extension-text-style@3.7.0(@tiptap/core@3.6.5(@tiptap/pm@3.6.5)))
       '@tiptap/extension-placeholder':
         specifier: ^3.6.5
         version: 3.6.5(@tiptap/extensions@3.6.5(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))(@tiptap/pm@3.6.5))
+      '@tiptap/extension-task-item':
+        specifier: ^3.7.0
+        version: 3.7.0(@tiptap/extension-list@3.6.5(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))(@tiptap/pm@3.6.5))
+      '@tiptap/extension-task-list':
+        specifier: ^3.7.0
+        version: 3.7.0(@tiptap/extension-list@3.6.5(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))(@tiptap/pm@3.6.5))
+      '@tiptap/extension-text-align':
+        specifier: ^3.7.0
+        version: 3.7.0(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))
+      '@tiptap/extension-text-style':
+        specifier: ^3.7.0
+        version: 3.7.0(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))
       '@tiptap/extension-underline':
         specifier: ^3.6.5
         version: 3.6.5(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))
@@ -29,6 +44,9 @@ importers:
       pinia:
         specifier: ^3.0.3
         version: 3.0.3(typescript@5.9.2)(vue@3.5.22(typescript@5.9.2))
+      tiptap-extension-line-height:
+        specifier: ^1.0.0
+        version: 1.0.0(@tiptap/pm@3.6.5)
       vue:
         specifier: ^3.5.21
         version: 3.5.22(typescript@5.9.2)
@@ -557,6 +575,11 @@ packages:
     peerDependencies:
       eslint: '>=9.0.0'
 
+  '@tiptap/core@2.26.3':
+    resolution: {integrity: sha512-TaOJzu2v5ufsOx+yu94NqXE504zmupVdFCxH1g3hk5fzZ3gT57Lh9R/27OjwM4e6o+Z3DXDl8yfFMHIcR3zUkg==}
+    peerDependencies:
+      '@tiptap/pm': ^2.7.0
+
   '@tiptap/core@3.6.5':
     resolution: {integrity: sha512-CgXuhevQbBcPfxaXzGZgIY9+aVMSAd68Q21g3EONz1iZBw026QgiaLhGK6jgGTErZL4GoNL/P+gC5nFCvN7+cA==}
     peerDependencies:
@@ -610,6 +633,11 @@ packages:
       '@floating-ui/dom': ^1.0.0
       '@tiptap/core': ^3.6.5
       '@tiptap/pm': ^3.6.5
+
+  '@tiptap/extension-font-family@3.7.0':
+    resolution: {integrity: sha512-8QUdm30FX7YdYCL1Jd6lXBAf3XYc/w30ZVSZe6jQ3GITydxhNV43u6eB0R8sshSB3u7gLY146x4zseHsR8qLuA==}
+    peerDependencies:
+      '@tiptap/extension-text-style': ^3.7.0
 
   '@tiptap/extension-gapcursor@3.6.5':
     resolution: {integrity: sha512-SHtp71zhV2bAQS8kaJ/otb2podGusDREZ9/SQ1rZi6yPcDFLS2KvIvsLssDwbjTuH6KefnsN6Vx01tzmXRAQig==}
@@ -678,6 +706,26 @@ packages:
     resolution: {integrity: sha512-QR7CUmRJ7fJkHtxqKajKIaX/B4xpKFOsAOJHbnqZ8wzOtnEL5IlsmoUnbKBoVn0+2R2YKKvMK3lepGtAcVCfIQ==}
     peerDependencies:
       '@tiptap/core': ^3.6.5
+
+  '@tiptap/extension-task-item@3.7.0':
+    resolution: {integrity: sha512-ASWsNNuXFEuc8qdejYfSIG48CCHFMs4t1IITNiFFpRpeaR6aTcle3bLTYaQDitqTo/iCBSVHhey/zkrEmcAluw==}
+    peerDependencies:
+      '@tiptap/extension-list': ^3.7.0
+
+  '@tiptap/extension-task-list@3.7.0':
+    resolution: {integrity: sha512-vpLwhKfv8NxwBvQsTD2Las3hUa+6eC1Dj9j/47i3Q52DxOSorhHBc9Sp2kr6PTtevz62PmeQ16oiF2jXjNg1dg==}
+    peerDependencies:
+      '@tiptap/extension-list': ^3.7.0
+
+  '@tiptap/extension-text-align@3.7.0':
+    resolution: {integrity: sha512-atMJaqApD5KsBK9ohhgxEOzz3grOrhMqasNS+YiGoJiYd8AN6Y7bQ216xgpza63h8wAbaqApU9xdrojU+z0p1w==}
+    peerDependencies:
+      '@tiptap/core': ^3.7.0
+
+  '@tiptap/extension-text-style@3.7.0':
+    resolution: {integrity: sha512-os4VwKw1gRMHUgsokHC2ZtQZI+u5UFAsqE92C28rGfAAi1Pk5V2VPODFfc+Uuy17hq3T5TjVd9H4p+aSxbVGIA==}
+    peerDependencies:
+      '@tiptap/core': ^3.7.0
 
   '@tiptap/extension-text@3.6.5':
     resolution: {integrity: sha512-PVZDWUa25xPzmEN6WWA103yvYJn+NBvWb7WrQwWu9LkKUgd98ZgV3yFaEem/Ybugl/NDPV7q8GGaH+2wEg/VeA==}
@@ -1609,6 +1657,9 @@ packages:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
     engines: {node: '>=12.0.0'}
 
+  tiptap-extension-line-height@1.0.0:
+    resolution: {integrity: sha512-tNQeBRgNKqPtMQ1/F8mB8r+v0bfdQX+Iw+Qg3CZu+7rcnnY57U+LcS9uxyINwCCAb5F6XnSuLBvbRVKJX5c6fg==}
+
   to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
@@ -2086,6 +2137,10 @@ snapshots:
       - supports-color
       - typescript
 
+  '@tiptap/core@2.26.3(@tiptap/pm@3.6.5)':
+    dependencies:
+      '@tiptap/pm': 3.6.5
+
   '@tiptap/core@3.6.5(@tiptap/pm@3.6.5)':
     dependencies:
       '@tiptap/pm': 3.6.5
@@ -2132,6 +2187,10 @@ snapshots:
       '@tiptap/core': 3.6.5(@tiptap/pm@3.6.5)
       '@tiptap/pm': 3.6.5
     optional: true
+
+  '@tiptap/extension-font-family@3.7.0(@tiptap/extension-text-style@3.7.0(@tiptap/core@3.6.5(@tiptap/pm@3.6.5)))':
+    dependencies:
+      '@tiptap/extension-text-style': 3.7.0(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))
 
   '@tiptap/extension-gapcursor@3.6.5(@tiptap/extensions@3.6.5(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))(@tiptap/pm@3.6.5))':
     dependencies:
@@ -2186,6 +2245,22 @@ snapshots:
       '@tiptap/extensions': 3.6.5(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))(@tiptap/pm@3.6.5)
 
   '@tiptap/extension-strike@3.6.5(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))':
+    dependencies:
+      '@tiptap/core': 3.6.5(@tiptap/pm@3.6.5)
+
+  '@tiptap/extension-task-item@3.7.0(@tiptap/extension-list@3.6.5(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))(@tiptap/pm@3.6.5))':
+    dependencies:
+      '@tiptap/extension-list': 3.6.5(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))(@tiptap/pm@3.6.5)
+
+  '@tiptap/extension-task-list@3.7.0(@tiptap/extension-list@3.6.5(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))(@tiptap/pm@3.6.5))':
+    dependencies:
+      '@tiptap/extension-list': 3.6.5(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))(@tiptap/pm@3.6.5)
+
+  '@tiptap/extension-text-align@3.7.0(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))':
+    dependencies:
+      '@tiptap/core': 3.6.5(@tiptap/pm@3.6.5)
+
+  '@tiptap/extension-text-style@3.7.0(@tiptap/core@3.6.5(@tiptap/pm@3.6.5))':
     dependencies:
       '@tiptap/core': 3.6.5(@tiptap/pm@3.6.5)
 
@@ -3236,6 +3311,12 @@ snapshots:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
+
+  tiptap-extension-line-height@1.0.0(@tiptap/pm@3.6.5):
+    dependencies:
+      '@tiptap/core': 2.26.3(@tiptap/pm@3.6.5)
+    transitivePeerDependencies:
+      - '@tiptap/pm'
 
   to-regex-range@5.0.1:
     dependencies:
