@@ -1,7 +1,6 @@
 <template>
-  <router-link :to="{ path: '/notebook'}">跳转到目标</router-link>
   <div class="home">
-    <div class="logo">NotePad</div>
+    <div class="logo">Entropy Notes</div>
     <div class="subtitle">简洁高效的笔记工具</div>
     <button type="button" class="enter-btn" @click="goNotebook">进入笔记</button>
   </div>
