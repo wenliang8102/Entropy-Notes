@@ -7,7 +7,10 @@
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
-  font-synthesis: none;
+  /* Allow browser to synthesize italic and bold font styles when native variants are unavailable.
+     This ensures italic button in TipTap editor displays text correctly.
+     See docs/FONT-SYNTHESIS-CHANGE.md for detailed explanation. */
+  font-synthesis: weight style;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
