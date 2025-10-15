@@ -6,7 +6,7 @@ import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
 
 import { Dropdown, Menu, MenuItem } from 'ant-design-vue'
-import { DownOutlined } from '@ant-design/icons-vue'
+import { DownOutlined, UnorderedListOutlined, OrderedListOutlined, RollbackOutlined } from '@ant-design/icons-vue'
 
 const editor = useEditor({
   extensions: [
@@ -103,13 +103,21 @@ const blockTypes = [
       <button type="button" @click="editor.chain().focus().toggleUnderline().run()" :class="{ active: editor.isActive('underline') }"><u>U</u></button>
       <button type="button" @click="editor.chain().focus().toggleStrike().run()" :class="{ active: editor.isActive('strike') }">S</button>
 
-      <button type="button" @click="editor.chain().focus().toggleBulletList().run()" :class="{ active: editor.isActive('bulletList') }">• 列表</button>
-      <button type="button" @click="editor.chain().focus().toggleOrderedList().run()" :class="{ active: editor.isActive('orderedList') }">1. 列表</button>
+      <button type="button" @click="editor.chain().focus().toggleBulletList().run()" :class="{ active: editor.isActive('bulletList') }" title="无序列表">
+        <UnorderedListOutlined />
+      </button>
+      <button type="button" @click="editor.chain().focus().toggleOrderedList().run()" :class="{ active: editor.isActive('orderedList') }" title="有序列表">
+        <OrderedListOutlined />
+      </button>
 
       <span class="spacer"></span>
 
-      <button type="button" @click="editor.chain().focus().undo().run()" :disabled="!editor.can().undo()">撤销</button>
-      <button type="button" @click="editor.chain().focus().redo().run()" :disabled="!editor.can().redo()">重做</button>
+      <button type="button" @click="editor.chain().focus().undo().run()" :disabled="!editor.can().undo()" title="撤销">
+        <RollbackOutlined />
+      </button>
+      <button type="button" @click="editor.chain().focus().redo().run()" :disabled="!editor.can().redo()" title="重做" class="redo-btn">
+        <RollbackOutlined class="flip" />
+      </button>
     </div>
 
     <EditorContent :editor="editor" class="editor" />
@@ -138,6 +146,13 @@ const blockTypes = [
   background: #e6f7ff;
   border-color: #91d5ff;
 }
+
+/* 图标水平翻转 */
+.toolbar .redo-btn .flip {
+  transform: scaleX(-1);
+  display: inline-block;
+}
+
 
 .editor {
   flex: 1;
