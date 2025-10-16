@@ -8,6 +8,8 @@ import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
 import TextAlign from '@tiptap/extension-text-align'
 import LineHeight from 'tiptap-extension-line-height'
+import Highlight from '@tiptap/extension-highlight'
+import { FontColor } from '../../extensions/FontColor'
 import EditorToolbar from './EditorToolbar.vue'
 import { Markdown } from 'tiptap-markdown'
 
@@ -32,6 +34,10 @@ const editor = useEditor({
       types: ['heading', 'paragraph'],
     }),
     LineHeight,
+    Highlight.configure({
+      multicolor: true,
+    }),
+    FontColor,
     Markdown.configure({
       html: false,
       tightLists: true,
@@ -46,7 +52,6 @@ const editor = useEditor({
 onBeforeUnmount(() => {
   editor?.value?.destroy()
 })
-
 
 </script>
 

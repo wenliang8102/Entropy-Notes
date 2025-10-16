@@ -1,5 +1,6 @@
 <script setup>
 import { defineProps } from 'vue'
+import { watch,ref } from 'vue'
 import { Dropdown, Menu, MenuItem } from 'ant-design-vue'
 import {
   DownOutlined,
@@ -12,6 +13,7 @@ import {
   AlignRightOutlined,
   MenuUnfoldOutlined,
   LineHeightOutlined,
+  HighlightOutlined,
   ExportOutlined,
 } from '@ant-design/icons-vue'
 import { saveAs } from 'file-saver'
@@ -102,6 +104,30 @@ const handleExport = async (format) => {
       break;
   }
 }
+
+// 存储选中的颜色值
+const selectedColor = ref('#000000')
+
+// 监听编辑器中选中文本的颜色变化，同步到选择器（fontColor 標記）
+watch(
+    () => {
+      if (!props.editor?.getAttributes) return null
+      const color = props.editor.getAttributes('fontColor')?.color
+      return color || null
+    },
+    (newColor) => {
+      if (newColor) {
+        selectedColor.value = newColor
+      }
+    }
+)
+
+// 应用颜色到选中文本（fontColor 標記）
+const applyColor = (color) => {
+  if (!props.editor) return
+  props.editor.chain().focus().setFontColor(color).run()
+}
+
 </script>
 
 <template>
@@ -150,10 +176,23 @@ const handleExport = async (format) => {
       </template>
     </Dropdown>
 
+    <button class="color-picker" title="文本颜色">
+      <input
+          type="color"
+          v-model="selectedColor"
+          @input="applyColor(selectedColor)"
+          class="color-input"
+      >
+    </button>
+
     <button type="button" @click="editor.chain().focus().toggleBold().run()" :class="{ active: editor.isActive('bold') }" title="加粗"><b>B</b></button>
     <button type="button" @click="editor.chain().focus().toggleItalic().run()" :class="{ active: editor.isActive('italic') }" title="斜体"><i>I</i></button>
     <button type="button" @click="editor.chain().focus().toggleUnderline().run()" :class="{ active: editor.isActive('underline') }" title="下划线"><u>U</u></button>
     <button type="button" @click="editor.chain().focus().toggleStrike().run()" :class="{ active: editor.isActive('strike') }" title="删除线">S</button>
+
+    <button type="button" @click="editor.chain().focus().toggleHighlight().run()" :class="{ active: editor.isActive('highlight') }" title="高亮">
+      <HighlightOutlined />
+    </button>
 
     <button type="button" @click="editor.chain().focus().toggleTaskList().run()" :class="{ active: editor.isActive('taskList') }" title="任务列表">
       <CheckSquareOutlined />
@@ -252,5 +291,17 @@ const handleExport = async (format) => {
   background: #e6f7ff;
   color: #1890ff;
   font-weight: bold;
+}
+
+/* 颜色选择器样式 */
+.color-input {
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
 }
 </style>
