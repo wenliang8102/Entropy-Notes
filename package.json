@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
+    "@tiptap/core": "^3.7.2",
     "@tiptap/extension-color": "^3.7.2",
     "@tiptap/extension-font-family": "^3.7.0",
     "@tiptap/extension-highlight": "^3.7.2",
