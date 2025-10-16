@@ -8,6 +8,8 @@ import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
 import TextAlign from '@tiptap/extension-text-align'
 import LineHeight from 'tiptap-extension-line-height'
+import Highlight from '@tiptap/extension-highlight'
+import { FontColor } from '../../extensions/FontColor'
 import EditorToolbar from './EditorToolbar.vue' // 1. 导入新组件
 
 //保存标题信息
@@ -31,6 +33,10 @@ const editor = useEditor({
       types: ['heading', 'paragraph'],
     }),
     LineHeight,
+    Highlight.configure({
+      multicolor: true,
+    }),
+    FontColor,
   ],
   content: '<p></p>',
   autofocus: 'end',
@@ -39,7 +45,6 @@ const editor = useEditor({
 onBeforeUnmount(() => {
   editor?.value?.destroy()
 })
-
 
 </script>
 
