@@ -12,12 +12,19 @@ import {
   AlignRightOutlined,
   MenuUnfoldOutlined,
   LineHeightOutlined,
+  ExportOutlined,
 } from '@ant-design/icons-vue'
+import { saveAs } from 'file-saver'
+
 
 const props = defineProps({
   editor: {
     type: Object,
     required: true,
+  },
+  documentTitle: {
+    type: String,
+    default: '无标题笔记',
   },
 })
 
@@ -76,6 +83,27 @@ const alignTypes = [
 
 // 行高配置
 const lineHeights = ['1', '1.5', '1.8', '2', '2.5', '3']
+
+const handleExport = (format) => {
+  if (!props.editor) return
+
+  const title = props.documentTitle || '无标题笔记'
+  let content = ''
+  let blob
+
+  switch (format) {
+    case 'html':
+      content = props.editor.getHTML()
+      blob = new Blob([content], { type: 'text/html;charset=utf-8' })
+      saveAs(blob, `${title}.html`)
+      break
+    case 'md':
+      content = props.editor.storage.markdown.getMarkdown()
+      blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
+      saveAs(blob, `${title}.md`)
+      break
+  }
+}
 </script>
 
 <template>
@@ -129,7 +157,7 @@ const lineHeights = ['1', '1.5', '1.8', '2', '2.5', '3']
     <button type="button" @click="editor.chain().focus().toggleUnderline().run()" :class="{ active: editor.isActive('underline') }" title="下划线"><u>U</u></button>
     <button type="button" @click="editor.chain().focus().toggleStrike().run()" :class="{ active: editor.isActive('strike') }" title="删除线">S</button>
 
-    <button type="button" @click="editor.chain().focus().toggleTaskList().run()" :class="{ active: editor.isActive('taskList') }" title="可勾选框">
+    <button type="button" @click="editor.chain().focus().toggleTaskList().run()" :class="{ active: editor.isActive('taskList') }" title="任务列表">
       <CheckSquareOutlined />
     </button>
     <button type="button" @click="editor.chain().focus().toggleBulletList().run()" :class="{ active: editor.isActive('bulletList') }" title="无序列表">
@@ -158,6 +186,26 @@ const lineHeights = ['1', '1.5', '1.8', '2', '2.5', '3']
 
     <span class="spacer"></span>
 
+    <!-- 导出按钮 -->
+    <Dropdown>
+      <template #default>
+        <button type="button" title="导出">
+          <ExportOutlined />
+          <DownOutlined />
+        </button>
+      </template>
+      <template #overlay>
+        <Menu>
+          <MenuItem @click="handleExport('html')">
+            导出为 HTML
+          </MenuItem>
+          <MenuItem @click="handleExport('md')">
+            导出为 Markdown
+          </MenuItem>
+        </Menu>
+      </template>
+    </Dropdown>
+
     <button type="button" @click="editor.chain().focus().undo().run()" :disabled="!editor.can().undo()" title="撤销">
       <RollbackOutlined />
     </button>
@@ -168,7 +216,6 @@ const lineHeights = ['1', '1.5', '1.8', '2', '2.5', '3']
 </template>
 
 <style scoped>
-/* 将 NoteArea.vue 中与 .toolbar 相关的样式迁移到这里 */
 .toolbar {
   display: flex;
   gap: 6px;

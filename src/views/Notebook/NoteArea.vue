@@ -8,7 +8,8 @@ import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
 import TextAlign from '@tiptap/extension-text-align'
 import LineHeight from 'tiptap-extension-line-height'
-import EditorToolbar from './EditorToolbar.vue' // 1. 导入新组件
+import EditorToolbar from './EditorToolbar.vue'
+import { Markdown } from 'tiptap-markdown'
 
 //保存标题信息
 const documentTitle = ref('')
@@ -16,11 +17,11 @@ const documentTitle = ref('')
 const editor = useEditor({
   extensions: [
     StarterKit.configure({
-      heading: { levels: [1, 2, 3,4,5,6] },
+      heading: { levels: [1, 2, 3, 4, 5, 6] },
       history: true,
     }),
     Placeholder.configure({
-      placeholder: '开始编辑...'
+      placeholder: '开始编辑...',
     }),
     Underline,
     TaskList,
@@ -31,8 +32,14 @@ const editor = useEditor({
       types: ['heading', 'paragraph'],
     }),
     LineHeight,
+    Markdown.configure({
+      html: false,
+      tightLists: true,
+      linkify: true,
+      breaks: true,
+    }),
   ],
-  content: '<p></p>',
+  content: '',
   autofocus: 'end',
 })
 
@@ -55,8 +62,8 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <!-- 并传入 editor 实例 -->
-    <EditorToolbar v-if="editor" :editor="editor" />
+    <!-- 传入editor 实例 -->
+    <EditorToolbar v-if="editor" :editor="editor" :document-title="documentTitle" />
 
     <EditorContent :editor="editor" class="editor" />
   </div>
@@ -104,6 +111,7 @@ onBeforeUnmount(() => {
 .editor :deep(.ProseMirror) {
   text-align: left;
   outline: none;
+  height: 100%;
 }
 
 .editor :deep(p) {
@@ -111,6 +119,13 @@ onBeforeUnmount(() => {
   margin-bottom: 0.5em;
 }
 
+.editor :deep(.ProseMirror :first-child::before) {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
 
 /* 添加任务列表和行高的样式 */
 .editor :deep(ul[data-type="taskList"]) {
