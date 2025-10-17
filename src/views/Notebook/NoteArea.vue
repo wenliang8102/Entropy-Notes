@@ -12,6 +12,8 @@ import Highlight from '@tiptap/extension-highlight'
 import { FontColor } from '../../extensions/FontColor'
 import EditorToolbar from './EditorToolbar.vue'
 import { Markdown } from 'tiptap-markdown'
+import {TextStyle} from '@tiptap/extension-text-style'
+import { FontSize } from '../../extensions/FontSize'
 
 //保存标题信息
 const documentTitle = ref('')
@@ -38,6 +40,8 @@ const editor = useEditor({
       multicolor: true,
     }),
     FontColor,
+    TextStyle,
+    FontSize,
     Markdown.configure({
       html: false,
       tightLists: true,

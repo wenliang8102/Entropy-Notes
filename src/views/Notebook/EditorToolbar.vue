@@ -3,7 +3,7 @@ import { defineProps } from 'vue'
 import { watch,ref } from 'vue'
 import { Dropdown, Menu, MenuItem } from 'ant-design-vue'
 import {
-  DownOutlined,
+  CaretDownOutlined,
   UnorderedListOutlined,
   OrderedListOutlined,
   RollbackOutlined,
@@ -53,7 +53,11 @@ const alignTypes = [
 // 行高配置
 const lineHeights = ['1', '1.5', '1.8', '2', '2.5', '3']
 
-
+// 字号配置
+const fontSizes = ['12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px', '48px', '64px']
+const applyFontSize = (size) => {
+  props.editor.chain().focus().setFontSize(size).run()
+}
 
 const handleExport = async (format) => {
   if (!props.editor) return;
@@ -137,7 +141,7 @@ const applyColor = (color) => {
       <template #default>
         <button type="button">
           {{ blockTypes.find((it) => it.isActive())?.label || '正文' }}
-          <DownOutlined />
+          <CaretDownOutlined />
         </button>
       </template>
       <template #overlay>
@@ -154,12 +158,34 @@ const applyColor = (color) => {
       </template>
     </Dropdown>
 
+    <!-- 字号 -->
+    <Dropdown>
+      <template #default>
+        <button type="button" title="字号">
+          <span>{{ editor.getAttributes('textStyle').fontSize || '16px' }}</span>
+          <CaretDownOutlined />
+        </button>
+      </template>
+      <template #overlay>
+        <Menu>
+          <MenuItem
+              v-for="size in fontSizes"
+              :key="size"
+              @click="applyFontSize(size)"
+              :class="{ active: editor.isActive('textStyle', { fontSize: size }) }"
+          >
+            {{ size }}
+          </MenuItem>
+        </Menu>
+      </template>
+    </Dropdown>
+
     <!--行高-->
     <Dropdown>
       <template #default>
         <button type="button" title="行高">
           <LineHeightOutlined />
-          <DownOutlined />
+          <CaretDownOutlined />
         </button>
       </template>
       <template #overlay>
@@ -228,7 +254,6 @@ const applyColor = (color) => {
       <template #default>
         <button type="button" title="导出">
           <ExportOutlined />
-          <DownOutlined />
         </button>
       </template>
       <template #overlay>
@@ -304,4 +329,6 @@ const applyColor = (color) => {
   appearance: none;
   -webkit-appearance: none;
 }
+
+
 </style>
