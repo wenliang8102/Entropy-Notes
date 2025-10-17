@@ -151,6 +151,7 @@ const handleExport = async (format) => {
 
 // 存储选中的颜色值
 const selectedColor = ref('#000000')
+const colorInputRef = ref(null)
 
 // 监听编辑器中选中文本的颜色变化，同步到选择器（fontColor 標記）
 watch(
@@ -170,6 +171,12 @@ watch(
 const applyColor = (color) => {
   if (!props.editor) return
   props.editor.chain().focus().setFontColor(color).run()
+}
+
+const openColorPicker = () => {
+  if (colorInputRef?.value) {
+    colorInputRef.value.click()
+  }
 }
 
 </script>
@@ -245,7 +252,7 @@ const applyColor = (color) => {
     <!--行高-->
     <Dropdown>
       <template #default>
-        <button type="button" title="行高">
+        <button type="button" title="行高" class="btn-compact">
           <LineHeightOutlined />
           <CaretDownOutlined />
         </button>
@@ -264,12 +271,21 @@ const applyColor = (color) => {
       </template>
     </Dropdown>
 
-    <button class="color-picker" title="文本颜色">
+    <button
+        type="button"
+        class="color-btn"
+        title="文本颜色"
+        @click="openColorPicker"
+        :class="{ active: editor.isActive('fontColor') }"
+    >
+      <span class="color-letter">A</span>
+      <span class="color-underline" :style="{ backgroundColor: selectedColor }"></span>
       <input
+          ref="colorInputRef"
           type="color"
           v-model="selectedColor"
           @input="applyColor(selectedColor)"
-          class="color-input"
+          class="color-input-hidden"
       >
     </button>
 
@@ -378,6 +394,12 @@ const applyColor = (color) => {
   color: #1890ff;
 }
 
+/* 更緊湊的按鈕（用於行高等） */
+.btn-compact {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
 /* 图标水平翻转 */
 .toolbar .redo-btn .flip {
   transform: scaleX(-1);
@@ -391,16 +413,33 @@ const applyColor = (color) => {
   font-weight: bold;
 }
 
-/* 颜色选择器样式 */
-.color-input {
-  width: 25px;
-  height: 25px;
-  padding: 0;
-  border: none;
+/* 颜色按钮樣式（與其他按鈕規格一致） */
+.color-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.color-letter {
+  font-weight: 700;
+}
+.color-underline {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 4px;
+  height: 3px;
+  border-radius: 2px;
+}
+.color-input-hidden {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto; /* 讓 input 接收點擊，定位以 input 為準 */
+  z-index: 1;
   cursor: pointer;
-  background: transparent;
-  appearance: none;
-  -webkit-appearance: none;
 }
 
 

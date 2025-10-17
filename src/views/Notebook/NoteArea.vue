@@ -11,6 +11,7 @@ import LineHeight from 'tiptap-extension-line-height'
 import Highlight from '@tiptap/extension-highlight'
 import { FontColor } from '../../extensions/FontColor'
 import EditorToolbar from './EditorToolbar.vue'
+import TocSidebar from './TocSidebar.vue'
 import { Markdown } from 'tiptap-markdown'
 import {FontFamily, TextStyle} from '@tiptap/extension-text-style'
 import { FontSize } from '../../extensions/FontSize'
@@ -82,7 +83,10 @@ onBeforeUnmount(() => {
     <!-- 传入editor 实例 -->
     <EditorToolbar v-if="editor" :editor="editor" :document-title="documentTitle" />
 
-    <EditorContent :editor="editor" class="editor" />
+    <div class="content-row">
+      <EditorContent :editor="editor" class="editor" />
+      <TocSidebar v-if="editor" :editor="editor" />
+    </div>
   </div>
 </template>
 
@@ -122,6 +126,12 @@ onBeforeUnmount(() => {
   overflow: auto;
   background: #fff;
   color: #213547;
+}
+
+.content-row {
+  flex: 1;
+  display: flex;
+  min-height: 0;
 }
 
 /* 去掉黑框 */
