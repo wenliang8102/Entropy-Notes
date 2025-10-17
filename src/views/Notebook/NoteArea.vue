@@ -14,6 +14,7 @@ import EditorToolbar from './EditorToolbar.vue'
 import { Markdown } from 'tiptap-markdown'
 import {TextStyle} from '@tiptap/extension-text-style'
 import { FontSize } from '../../extensions/FontSize'
+import { CustomItalic } from '../../extensions/CustomItalic.js'
 
 //保存标题信息
 const documentTitle = ref('')
@@ -23,6 +24,7 @@ const editor = useEditor({
     StarterKit.configure({
       heading: { levels: [1, 2, 3, 4, 5, 6] },
       history: true,
+      italic: false,
     }),
     Placeholder.configure({
       placeholder: '开始编辑...',
@@ -48,6 +50,7 @@ const editor = useEditor({
       linkify: true,
       breaks: true,
     }),
+    CustomItalic,
   ],
   content: '',
   autofocus: 'end',
