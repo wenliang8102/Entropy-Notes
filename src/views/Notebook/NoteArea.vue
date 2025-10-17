@@ -12,7 +12,7 @@ import Highlight from '@tiptap/extension-highlight'
 import { FontColor } from '../../extensions/FontColor'
 import EditorToolbar from './EditorToolbar.vue'
 import { Markdown } from 'tiptap-markdown'
-import {TextStyle} from '@tiptap/extension-text-style'
+import {FontFamily, TextStyle} from '@tiptap/extension-text-style'
 import { FontSize } from '../../extensions/FontSize'
 import { CustomItalic } from '../../extensions/CustomItalic.js'
 
@@ -44,6 +44,9 @@ const editor = useEditor({
     FontColor,
     TextStyle,
     FontSize,
+    FontFamily.configure({
+      types: ['textStyle'],
+    }),
     Markdown.configure({
       html: false,
       tightLists: true,

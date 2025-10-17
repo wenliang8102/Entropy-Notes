@@ -42,6 +42,17 @@ const blockTypes = [
   {label: 'H6', level: 6, isActive: () => props.editor?.isActive('heading', { level: 6 }), command: () => props.editor?.chain().focus().toggleHeading({ level: 6 }).run(),},
 ]
 
+// 字体配置
+const fontFamilies = [
+  { label: '默认', value: '' },
+  { label: '宋体', value: 'SimSun' },
+  { label: '黑体', value: 'SimHei' },
+  { label: '微软雅黑', value: 'Microsoft YaHei' },
+  { label: 'Arial', value: 'Arial' },
+  { label: 'Helvetica', value: 'Helvetica' },
+  { label: 'Times New Roman', value: 'Times New Roman' },
+]
+
 // 文本对齐配置
 const alignTypes = [
   { label: '左对齐', value: 'left', icon: AlignLeftOutlined, command: () => props.editor?.chain().focus().setTextAlign('left').run() },
@@ -77,8 +88,7 @@ const handleExport = async (format) => {
         blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
         saveAs(blob, `${title}.md`);
       } else {
-        console.error('Markdown 导出功能未正确配置！请检查 NoteArea.vue 中的 tiptap-markdown 拓展。');
-        alert('Markdown 导出功能未正确配置！');
+        console.error('导出错误');
       }
       break;
 
@@ -153,6 +163,28 @@ const applyColor = (color) => {
               @click="type.command"
           >
             {{ type.label }}
+          </MenuItem>
+        </Menu>
+      </template>
+    </Dropdown>
+
+    <!-- 字体 -->
+    <Dropdown>
+      <template #default>
+        <button type="button" title="字体">
+          <span>{{ editor.getAttributes('textStyle').fontFamily?.replace(/,.*$/, '') || '默认' }}</span>
+          <CaretDownOutlined />
+        </button>
+      </template>
+      <template #overlay>
+        <Menu>
+          <MenuItem
+              v-for="font in fontFamilies"
+              :key="font.value"
+              @click="font.value ? editor.chain().focus().setFontFamily(font.value).run() : editor.chain().focus().unsetFontFamily().run()"
+              :class="{ active: editor.isActive('textStyle', { fontFamily: font.value }) }"
+          >
+            <span :style="{ fontFamily: font.value }">{{ font.label }}</span>
           </MenuItem>
         </Menu>
       </template>
