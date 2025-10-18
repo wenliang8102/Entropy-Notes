@@ -28,9 +28,24 @@ export const useNotesStore = defineStore('notes', () => {
 
     // 创建一个新笔记
     function createNote() {
+        // 生成自动编号的标题
+        const generateTitle = () => {
+            const baseTitle = '未命名笔记'
+            let counter = 1
+            let title = `${baseTitle}${counter}`
+            
+            // 检查是否存在相同标题的笔记，如果存在则递增编号
+            while (notes.value.some(note => note.title === title)) {
+                counter++
+                title = `${baseTitle}${counter}`
+            }
+            
+            return title
+        }
+
         const newNote = {
             id: `note_${Date.now()}`,
-            title: '无标题笔记',
+            title: generateTitle(),
             content: '', // TipTap 的内容可以是 JSON 或 HTML
             createdAt: Date.now(),
             lastModified: Date.now(),

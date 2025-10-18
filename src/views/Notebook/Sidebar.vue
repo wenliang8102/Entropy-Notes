@@ -106,13 +106,14 @@ function handleCreateNote() {
 .new-note-wrapper {
   padding: 8px 16px;
   border-bottom: 1px solid #ececec;
+  margin-top: 20px; /* 与“设置”之间预留20px距离 */
 }
 .new-note-btn {
   width: 100%;
   padding: 8px;
-  background: #e6f7ff;
-  border: 1px solid #91d5ff;
-  color: #1890ff;
+  background: none;
+  border: transparent;
+  color: #1a1a1a;
   border-radius: 4px;
   cursor: pointer;
   display: flex;
@@ -120,9 +121,15 @@ function handleCreateNote() {
   justify-content: center;
   gap: 8px;
   font-weight: 500;
+  transition: all 0.2s;
+}
+.new-note-btn:focus {
+  outline: none; /* 清除浏览器默认的焦点边框 */
 }
 .new-note-btn:hover {
-  background: #d9f2ff;
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  color: #1890ff;
 }
 .sidebar.collapsed .new-note-btn span {
   display: none;
@@ -184,7 +191,6 @@ function handleCreateNote() {
   list-style: none;
   padding: 0;
   margin: 0;
-  flex: 1;
 }
 .menu li {
   display: flex;
