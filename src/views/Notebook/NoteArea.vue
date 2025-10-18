@@ -82,11 +82,14 @@ watch(() => notesStore.activeNote, (newActiveNote, oldActiveNote) => {
   if (newActiveNote) {
     // 切换到新笔记，更新编辑器的标题和内容
     const newContent = newActiveNote.content || ''
+    // 更新原始标题
+    originalTitle.value = newActiveNote.title || ''
 
     // 使用 setContent 会重置光标位置
     editor.value.commands.setContent(newContent, false)
   } else {
     // 没有激活的笔记（例如所有笔记都被删除了）
+    originalTitle.value = ''
     editor.value.commands.clearContent()
   }
 }, )
@@ -98,9 +101,37 @@ onMounted(() => {
   }
 })
 
+// 存储原始标题，用于重名时恢复
+const originalTitle = ref('')
+const titleInputRef = ref(null)
+
 //  监听标题输入框的变化，并通知 store
 const handleTitleChange = (event) => {
   notesStore.updateActiveNote({ title: event.target.value })
+}
+
+// 监听输入框失去焦点事件，进行重名检查
+const handleTitleBlur = (event) => {
+  const newTitle = event.target.value
+  
+  // 检查是否与其他笔记重名
+  const isDuplicate = notesStore.notes.some(note => 
+    note.id !== notesStore.activeNoteId && 
+    note.title === newTitle
+  )
+  
+  if (isDuplicate) {
+    // 如果重名，显示提示并恢复原始标题
+    alert('标题不能与其他笔记相同，请修改标题')
+    notesStore.updateActiveNote({ title: originalTitle.value })
+    // 恢复输入框的值
+    event.target.value = originalTitle.value
+    event.target.focus()
+    event.target.select()
+  } else {
+    // 如果不重名，更新原始标题
+    originalTitle.value = newTitle
+  }
 }
 
 
@@ -115,12 +146,14 @@ onBeforeUnmount(() => {
     <!-- 文档标题框 -->
     <div class="title-wrapper">
       <input
+          ref="titleInputRef"
           type="text"
           class="document-title-input"
           placeholder="请输入标题"
           :key="notesStore.activeNote.id"
           :value="notesStore.activeNote.title"
           @input="handleTitleChange"
+          @blur="handleTitleBlur"
       />
     </div>
 
