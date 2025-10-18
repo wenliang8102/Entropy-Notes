@@ -126,6 +126,7 @@ onBeforeUnmount(() => {
   overflow: auto;
   background: #fff;
   color: #213547;
+  min-width: 0;
 }
 
 .content-row {
@@ -180,5 +181,23 @@ onBeforeUnmount(() => {
   height: auto;
   border-radius: 4px;
   margin: 0.5em 0;
+}
+
+.editor::-webkit-scrollbar {
+  width: 8px; /* 滚动条宽度，调窄一点 */
+  height: 8px;
+}
+
+.editor::-webkit-scrollbar-track {
+  background: transparent; /* 滚动条轨道背景，设为透明 */
+}
+
+.editor::-webkit-scrollbar-thumb {
+  background: #e0e0e0; /* 滚动条滑块颜色，淡灰色 */
+  border-radius: 4px; /* 滑块圆角 */
+}
+
+.editor::-webkit-scrollbar-thumb:hover {
+  background: #cccccc; /* 鼠标悬浮时滑块颜色，稍深一点 */
 }
 </style>

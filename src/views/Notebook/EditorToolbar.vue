@@ -34,7 +34,6 @@ const props = defineProps({
 
 const fileInput = ref(null)
 
-
 const triggerFileInput = () => {
   fileInput.value?.click()
 }
@@ -208,7 +207,7 @@ const openColorPicker = () => {
     <!-- 字体 -->
     <Dropdown>
       <template #default>
-        <button type="button" title="字体">
+        <button type="button" title="字体" class="font-btn">
           <span>{{ editor.getAttributes('textStyle').fontFamily?.replace(/,.*$/, '') || '默认' }}</span>
           <CaretDownOutlined />
         </button>
@@ -384,16 +383,27 @@ const openColorPicker = () => {
   background: transparent;
   border: 1px solid transparent;
 }
+.toolbar button:focus {
+  outline: none;
+  box-shadow: none;
+}
 .toolbar button:hover {
   background: #f5f5f5;
   border-color: #e5e5e5;
+}
+.toolbar .font-btn span {
+  display: inline-block;
+  max-width: 8ch; /* 根据需要调整宽度（也可用 px，例如 80px） */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 .toolbar button.active {
   background: #e6f7ff;
   border-color: #91d5ff;
   color: #1890ff;
 }
-
 /* 更緊湊的按鈕（用於行高等） */
 .btn-compact {
   padding-left: 6px;
@@ -441,6 +451,7 @@ const openColorPicker = () => {
   z-index: 1;
   cursor: pointer;
 }
+
 
 
 </style>
