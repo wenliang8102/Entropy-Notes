@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps, defineEmits ,computed} from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { LeftOutlined, RightOutlined ,PlusOutlined} from '@ant-design/icons-vue'
+import { LeftOutlined, RightOutlined ,PlusOutlined, DeleteOutlined} from '@ant-design/icons-vue'
 import { useNotesStore } from '@/stores/notes'
 
 const router = useRouter()
@@ -44,6 +44,16 @@ function handleSelectNote(noteId) {
 function handleCreateNote() {
   notesStore.createNote()
 }
+
+// 处理删除笔记
+function handleDeleteNote(event, note) {
+  event.stopPropagation() // 阻止触发点击选择笔记
+  
+  const noteTitle = note.title || '无标题笔记'
+  if (confirm(`确认要删除"${noteTitle}"吗？`)) {
+    notesStore.deleteNote(note.id)
+  }
+}
 </script>
 
 <template>
@@ -81,6 +91,14 @@ function handleCreateNote() {
       >
         <span class="icon">📒</span>
         <span v-if="!isCollapsed" class="note-title">{{ note.title || '无标题笔记' }}</span>
+        <button 
+          v-if="!isCollapsed" 
+          class="delete-btn" 
+          @click="handleDeleteNote($event, note)"
+          title="删除笔记"
+        >
+          <DeleteOutlined />
+        </button>
       </li>
     </ul>
   </div>
@@ -112,7 +130,7 @@ function handleCreateNote() {
   width: 100%;
   padding: 8px;
   background: none;
-  border: transparent;
+  border: 1px solid transparent;
   color: #1a1a1a;
   border-radius: 4px;
   cursor: pointer;
@@ -151,7 +169,27 @@ function handleCreateNote() {
   flex: 1;
   overflow-y: auto; /* 让笔记列表可以滚动 */
 }
+
+/* 自定义滚动条样式 */
+.notes-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notes-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.notes-list::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.notes-list::-webkit-scrollbar-thumb:hover {
+  background: #bfbfbf;
+}
 .notes-list li {
+  position: relative;
   display: flex;
   align-items: center;
   padding: 10px 20px;
@@ -221,5 +259,42 @@ function handleCreateNote() {
 }
 .sidebar.collapsed .menu li span:not(.icon) {
   display: none;
+}
+
+/* 删除按钮样式 */
+.delete-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  color: #999;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  min-width: 20px;
+  box-sizing: border-box;
+}
+
+.notes-list li:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  background: transparent;
+  color: #666;
+}
+.delete-btn:focus{
+  outline: none;
 }
 </style>
