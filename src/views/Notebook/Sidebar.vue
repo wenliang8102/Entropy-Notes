@@ -31,13 +31,13 @@ const goRoute=(item)=> {
 }
 
 const sortedNotes = computed(() => {
-  // 返回一个按 lastModified 时间降序排序的副本
   return [...notesStore.notes].sort((a, b) => b.lastModified - a.lastModified)
 })
 
-//  处理切换笔记
+
 function handleSelectNote(noteId) {
   notesStore.setActiveNote(noteId)
+  notesStore.updateActiveNote({})
 }
 
 //  处理新建笔记
