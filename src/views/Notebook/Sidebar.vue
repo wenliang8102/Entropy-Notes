@@ -131,7 +131,9 @@ function handleCreateNote() {
   border: 1px solid #91d5ff;
   color: #1890ff;
 }
-.sidebar.collapsed .new-note-btn span {
+
+/*保留图标，隐藏文字*/
+.sidebar.collapsed .new-note-btn span:nth-of-type(2) {
   display: none;
 }
 
