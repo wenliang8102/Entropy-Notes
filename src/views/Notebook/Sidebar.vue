@@ -112,7 +112,6 @@ function handleCreateNote() {
   width: 100%;
   padding: 8px;
   background: none;
-  border: transparent;
   color: #1a1a1a;
   border-radius: 4px;
   cursor: pointer;
@@ -122,6 +121,7 @@ function handleCreateNote() {
   gap: 8px;
   font-weight: 500;
   transition: all 0.2s;
+  border: 1px solid transparent;
 }
 .new-note-btn:focus {
   outline: none; /* 清除浏览器默认的焦点边框 */
