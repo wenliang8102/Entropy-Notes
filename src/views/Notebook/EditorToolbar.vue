@@ -15,6 +15,7 @@ import {
   LineHeightOutlined,
   HighlightOutlined,
   ExportOutlined,
+  FileImageOutlined,
 } from '@ant-design/icons-vue'
 import { saveAs } from 'file-saver'
 import HTMLtoDOCX from 'html-to-docx-ts';
@@ -30,6 +31,35 @@ const props = defineProps({
     default: '无标题笔记',
   },
 })
+
+const fileInput = ref(null)
+
+
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+//  处理文件选择事件
+const handleFileChange = (event) => {
+  const file = event.target.files?.[0]
+  if (!file || !props.editor) {
+    return
+  }
+
+  // 使用 FileReader 将图片文件转换为 Base64 Data URL
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const src = e.target?.result
+    if (src) {
+      // 调用 editor 的命令插入图片
+      props.editor.chain().focus().setImage({ src }).run()
+    }
+  }
+  reader.readAsDataURL(file)
+
+  // 清空输入框，以便下次可以选择同一个文件
+  event.target.value = ''
+}
 
 // 多级标题配置
 const blockTypes = [
@@ -134,7 +164,7 @@ watch(
       if (newColor) {
         selectedColor.value = newColor
       }
-    }
+    },
 )
 
 // 应用颜色到选中文本（fontColor 標記）
@@ -278,12 +308,23 @@ const openColorPicker = () => {
       <OrderedListOutlined />
     </button>
 
+    <button type="button" @click="triggerFileInput" title="插入图片">
+      <FileImageOutlined />
+    </button>
+
+    <input
+        type="file"
+        ref="fileInput"
+        @change="handleFileChange"
+        accept="image/*"
+        style="display: none"
+    />
+
     <!-- 文本对齐 -->
     <Dropdown>
       <template #default>
         <button type="button">
           <component :is="alignTypes.find(a => editor.isActive({ textAlign: a.value }))?.icon || AlignLeftOutlined" />
-          <DownOutlined />
         </button>
       </template>
       <template #overlay>

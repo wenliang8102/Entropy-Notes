@@ -16,6 +16,7 @@ import { Markdown } from 'tiptap-markdown'
 import {FontFamily, TextStyle} from '@tiptap/extension-text-style'
 import { FontSize } from '../../extensions/FontSize'
 import { CustomItalic } from '../../extensions/CustomItalic.js'
+import Image from '@tiptap/extension-image'
 
 //保存标题信息
 const documentTitle = ref('')
@@ -55,6 +56,7 @@ const editor = useEditor({
       breaks: true,
     }),
     CustomItalic,
+    Image,
   ],
   content: '',
   autofocus: 'end',
@@ -172,5 +174,11 @@ onBeforeUnmount(() => {
 .editor :deep(ul[data-type="taskList"] li[data-checked="true"] > div > p) {
   text-decoration: line-through;
   color: #adb5bd;
+}
+.editor :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 0.5em 0;
 }
 </style>
