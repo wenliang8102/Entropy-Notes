@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeUnmount, ref, watch} from 'vue'
+import {onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
@@ -69,11 +69,12 @@ const editor = useEditor({
   },
 })
 
+
 //  监听 store 中 activeNote 的变化
 watch(() => notesStore.activeNote, (newActiveNote, oldActiveNote) => {
   if (!editor.value) return
 
-  // 如果新旧笔记是同一个，则不重新加载，避免光标跳动
+  // 如果新旧笔记是同一个，则不重新加载
   if (newActiveNote && oldActiveNote && newActiveNote.id === oldActiveNote.id) {
     return
   }
@@ -88,8 +89,13 @@ watch(() => notesStore.activeNote, (newActiveNote, oldActiveNote) => {
     // 没有激活的笔记（例如所有笔记都被删除了）
     editor.value.commands.clearContent()
   }
-}, {
-  immediate: true // 立即执行一次，以便在组件加载时设置初始内容
+}, )
+
+onMounted(() => {
+  if (notesStore.activeNote && editor.value) {
+    const initialContent = notesStore.activeNote.content || ''
+    editor.value.commands.setContent(initialContent, false)
+  }
 })
 
 //  监听标题输入框的变化，并通知 store
