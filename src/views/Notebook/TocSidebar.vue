@@ -7,6 +7,7 @@ const props = defineProps({
 
 const headings = ref([]) // [{ uid, el, level, text }]
 const activeUid = ref('')
+const isCollapsed = ref(false)
 const filteredHeadings = computed(() =>
   (headings.value || []).filter(h => (h.text || '').trim().length > 0)
 )
@@ -17,7 +18,7 @@ const rebuildHeadings = () => {
   const view = props.editor.view
   const dom = view.dom
   const list = []
-  // 直接保存元素引用，避免 id 在渲染更新時失效
+  // 直接保存元素引用，避免 id 在渲染更新时失效
   const nodes = dom.querySelectorAll('h1, h2, h3, h4, h5, h6')
   nodes.forEach((el) => {
     const level = Number(el.tagName.substring(1))
@@ -70,7 +71,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <aside class="toc">
+  <aside class="toc" :class="{ collapsed: isCollapsed }">
+    <button type="button" class="toggle-btn" @click="isCollapsed = !isCollapsed" :title="isCollapsed ? '展开' : '收起'">
+      <span class="toggle-icon" :class="{ collapsed: isCollapsed }">‹</span>
+    </button>
     <div v-if="filteredHeadings.length === 0" class="empty">开始导航...</div>
     <ul v-else class="list">
       <li
@@ -84,7 +88,7 @@ onBeforeUnmount(() => {
       </li>
     </ul>
   </aside>
-.</template>
+</template>
 
 <style scoped>
 .toc {
@@ -93,6 +97,60 @@ onBeforeUnmount(() => {
   background: #fff;
   overflow: auto;
   padding: 8px 8px 16px;
+  transition: width 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.toc.collapsed {
+  width: 40px;
+}
+.toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  outline: none;
+  margin-bottom: 8px;
+  align-self: flex-start;
+}
+.toggle-btn:hover {
+  background: #e6f7ff;
+  border: none;
+}
+.toggle-btn:focus {
+  outline: none;
+}
+.toggle-btn:active {
+  outline: none;
+}
+.toggle-icon {
+  display: inline-block;
+  font-size: 20px;
+  font-weight: bold;
+  color: #999;
+  transition: transform 0.2s;
+  transform: scaleX(-1);
+}
+.toggle-icon.collapsed {
+  transform: scaleX(-1) rotate(180deg);
+}
+.toc.collapsed .empty,
+.toc.collapsed .list {
+  display: none;
+}
+.toc.collapsed .toggle-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #fff;
+  z-index: 10;
+}
+.toc.collapsed .toggle-btn:hover {
+  background: #e6f7ff;
 }
 .empty {
   color: #adb5bd;
