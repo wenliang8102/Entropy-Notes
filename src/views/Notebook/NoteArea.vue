@@ -105,7 +105,7 @@ onMounted(() => {
 const originalTitle = ref('')
 const titleInputRef = ref(null)
 
-//  监听标题输入框的变化，并通知 store
+//  监听标题输入框的变化
 const handleTitleChange = (event) => {
   notesStore.updateActiveNote({ title: event.target.value })
 }
@@ -165,7 +165,7 @@ onBeforeUnmount(() => {
       <TocSidebar v-if="editor" :editor="editor" />
     </div>
   </div>
-  <!-- 当没有激活笔记时，显示一个提示信息 -->
+
   <div class="note-area-empty" v-else>
     <div class="empty-content">
       <h2>没有打开的笔记</h2>

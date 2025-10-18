@@ -140,6 +140,7 @@ function handleDeleteNote(event, note) {
   gap: 8px;
   font-weight: 500;
   transition: all 0.2s;
+  border: 1px solid transparent;
 }
 .new-note-btn:focus {
   outline: none; /* 清除浏览器默认的焦点边框 */
@@ -149,7 +150,9 @@ function handleDeleteNote(event, note) {
   border: 1px solid #91d5ff;
   color: #1890ff;
 }
-.sidebar.collapsed .new-note-btn span {
+
+/*保留图标，隐藏文字*/
+.sidebar.collapsed .new-note-btn span:nth-of-type(2) {
   display: none;
 }
 
