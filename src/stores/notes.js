@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import { useEditor } from '@tiptap/vue-3'
+
 
 // 防抖函数
 function debounce(func, delay) {
@@ -20,7 +20,6 @@ export const useNotesStore = defineStore('notes', () => {
 
     // 获取当前激活的笔记对象
     const activeNote = computed(() => {
-        // 如果没有激活的ID，或者在笔记列表中找不到，则返回 null
         if (!activeNoteId.value) return null
         return notes.value.find(note => note.id === activeNoteId.value) || null
     })
@@ -33,13 +32,13 @@ export const useNotesStore = defineStore('notes', () => {
             const baseTitle = '未命名笔记'
             let counter = 1
             let title = `${baseTitle}${counter}`
-            
+
             // 检查是否存在相同标题的笔记，如果存在则递增编号
             while (notes.value.some(note => note.title === title)) {
                 counter++
                 title = `${baseTitle}${counter}`
             }
-            
+
             return title
         }
 
@@ -61,6 +60,15 @@ export const useNotesStore = defineStore('notes', () => {
         activeNoteId.value = id
     }
 
+    //  处理切换笔记
+    function handleSelectNote(noteId) {
+        // 1. 设置当前激活的笔记
+        notesStore.setActiveNote(noteId)
+
+        // 2. 主动更新时间戳，确保它总能排到最前面
+        //    我们只传递一个空对象或不传参数，因为我们只想触发 lastModified 的更新
+        notesStore.updateActiveNote({})
+    }
     // 更新当前激活笔记的标题和内容
     function updateActiveNote(payload) {
         if (!activeNote.value) return
@@ -91,7 +99,6 @@ export const useNotesStore = defineStore('notes', () => {
 
 
     // 使用 watch 来监听 state 的变化，并自动保存到 localStorage
-    // 使用防抖函数，在用户停止输入 500ms 后再保存，避免性能问题
     const saveStateToLocalStorage = debounce(() => {
         localStorage.setItem('entropy-notes-list', JSON.stringify(notes.value))
         if (activeNoteId.value) {

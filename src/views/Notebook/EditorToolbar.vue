@@ -452,6 +452,8 @@ const openColorPicker = () => {
   cursor: pointer;
 }
 
-
+.toolbar :deep(.anticon-caret-down) {
+  color: #ccc;
+}
 
 </style>
