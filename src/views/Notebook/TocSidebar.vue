@@ -1,4 +1,5 @@
 <script setup>
+import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
 import { onMounted, onBeforeUnmount, ref, watch, computed } from 'vue'
 
 const props = defineProps({
@@ -73,7 +74,10 @@ onBeforeUnmount(() => {
 <template>
   <aside class="toc" :class="{ collapsed: isCollapsed }">
     <button type="button" class="toggle-btn" @click="isCollapsed = !isCollapsed" :title="isCollapsed ? '展开' : '收起'">
-      <span class="toggle-icon" :class="{ collapsed: isCollapsed }">‹</span>
+      <span class="toggle-icon" :class="{ collapsed: isCollapsed }">
+        <MenuUnfoldOutlined v-if="!isCollapsed" class="toggle-icon" />
+      <MenuFoldOutlined v-else class="toggle-icon" />
+      </span>
     </button>
     <div v-if="filteredHeadings.length === 0" class="empty">开始导航...</div>
     <ul v-else class="list">
@@ -110,12 +114,14 @@ onBeforeUnmount(() => {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px 6px;
+  padding: 8px 12px;
   border-radius: 4px;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
   outline: none;
   margin-bottom: 8px;
   align-self: flex-start;
+  position: relative;
+  right: 0;
 }
 .toggle-btn:hover {
   background: #e6f7ff;
@@ -132,8 +138,6 @@ onBeforeUnmount(() => {
   font-size: 20px;
   font-weight: bold;
   color: #999;
-  transition: transform 0.2s;
-  transform: scaleX(-1);
 }
 .toggle-icon.collapsed {
   transform: scaleX(-1) rotate(180deg);
@@ -148,6 +152,17 @@ onBeforeUnmount(() => {
   right: 8px;
   background: #fff;
   z-index: 10;
+  transition: right 0.2s ease;
+  animation: slideToRight 0.2s ease;
+}
+
+@keyframes slideToRight {
+  0% {
+    right: calc(100% - 40px);
+  }
+  100% {
+    right: 8px;
+  }
 }
 .toc.collapsed .toggle-btn:hover {
   background: #e6f7ff;
