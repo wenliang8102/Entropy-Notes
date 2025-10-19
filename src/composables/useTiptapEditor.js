@@ -1,4 +1,4 @@
-import { onBeforeUnmount, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue'
 import { useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
@@ -8,13 +8,12 @@ import TaskItem from '@tiptap/extension-task-item'
 import TextAlign from '@tiptap/extension-text-align'
 import LineHeight from 'tiptap-extension-line-height'
 import Highlight from '@tiptap/extension-highlight'
-import { FontColor } from '../extensions/FontColor'
+import { FontColor } from '@/extensions/FontColor'
 import { Markdown } from 'tiptap-markdown'
 import { FontFamily, TextStyle } from '@tiptap/extension-text-style'
-import { FontSize } from '../extensions/FontSize'
-import { CustomItalic } from '../extensions/CustomItalic.js'
+import { FontSize } from '@/extensions/FontSize'
+import { CustomItalic } from '@/extensions/CustomItalic.js'
 import Image from '@tiptap/extension-image'
-import { nextTick } from 'vue'
 
 // 编辑器插件配置
 const editorExtensions = [
@@ -57,10 +56,10 @@ const editorExtensions = [
 /**
  * @description 封装 Tiptap 编辑器逻辑
  * @param {import('@/stores/notes').useNotesStore} notesStore - Pinia store 实例
- * @returns {{editor: import('@tiptap/vue-3').Editor, isLoadingContent: import('vue').Ref<boolean>}}
+ * @returns {{editor: import('@tiptap/vue-3').Editor}}
  */
 export function useTiptapEditor(notesStore) {
-    const isLoadingContent = ref(false)
+    const isLoadingContent = ref(false) // 静音按钮逻辑
 
     const editor = useEditor({
         extensions: editorExtensions,
@@ -76,29 +75,36 @@ export function useTiptapEditor(notesStore) {
         },
     })
 
-    // 监听 activeNote 变化，更新编辑器内容
+    // 监听 activeNote 切换，更新编辑器内容
     watch(() => notesStore.activeNote, (newActiveNote, oldActiveNote) => {
         if (!editor.value || (newActiveNote && oldActiveNote && newActiveNote.id === oldActiveNote.id)) {
             return
         }
 
         isLoadingContent.value = true
-
         const newContent = newActiveNote?.content || ''
         editor.value.commands.setContent(newContent, false)
 
-        // 确保 DOM 更新后再解除加载状态
         nextTick(() => {
             isLoadingContent.value = false
         })
-    }, {
-        immediate: true, // 使用 immediate 确保初始加载
-        deep: true // 深度监听以处理初始加载
+    })
+
+    // 处理页面首次加载或刷新时的情况
+    onMounted(() => {
+        if (notesStore.activeNote && editor.value) {
+            isLoadingContent.value = true
+            const initialContent = notesStore.activeNote.content || ''
+            editor.value.commands.setContent(initialContent, false)
+            nextTick(() => {
+                isLoadingContent.value = false
+            })
+        }
     })
 
     onBeforeUnmount(() => {
         editor.value?.destroy()
     })
 
-    return { editor, isLoadingContent }
+    return { editor }
 }
