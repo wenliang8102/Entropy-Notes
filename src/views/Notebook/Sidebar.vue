@@ -69,11 +69,7 @@ function handleCreateNote() {
 // 处理删除笔记
 function handleDeleteNote(event, note) {
   event.stopPropagation() // 阻止触发点击选择笔记
-  
-  const noteTitle = note.title || '无标题笔记'
-  if (confirm(`确认要删除"${noteTitle}"吗？`)) {
-    notesStore.deleteNote(note.id)
-  }
+  notesStore.deleteNote(note.id)
 }
 </script>
 
