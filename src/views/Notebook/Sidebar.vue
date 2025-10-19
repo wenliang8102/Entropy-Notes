@@ -175,12 +175,22 @@ function handleDeleteNote(event, note) {
   display: none;
 }
 
+/* 新建笔记按钮文字布局优化 */
+.new-note-btn span {
+  white-space: nowrap;      /* 强制文字不换行（关键） */
+  overflow: hidden;         /* 超出宽度的部分隐藏（避免溢出） */
+  text-overflow: ellipsis;  /* 超出部分显示省略号（可选，更美观） */
+}
+
 .notes-list-header {
   padding: 16px 20px 8px;
   font-size: 12px;
   color: #888;
   font-weight: 600;
   text-transform: uppercase;
+  white-space: nowrap;      /* 强制文字不换行（关键） */
+  overflow: hidden;         /* 超出宽度的部分隐藏（避免溢出） */
+  text-overflow: ellipsis;  /* 超出部分显示省略号（可选，更美观） */
 }
 
 
@@ -212,11 +222,16 @@ function handleDeleteNote(event, note) {
   flex-direction: column;
   overflow: hidden;
   gap: 4px; /* 标题和时间戳之间的间距 */
+  flex: 1; /* 占据剩余空间 */
+  min-width: 0; /* 允许收缩 */
 }
 
 .notes-list li .note-timestamp {
   font-size: 12px;
   color: #888;
+  white-space: nowrap;      /* 强制文字不换行（关键） */
+  overflow: hidden;         /* 超出宽度的部分隐藏（避免溢出） */
+  text-overflow: ellipsis;  /* 超出部分显示省略号（可选，更美观） */
 }
 
 .notes-list li.active .note-timestamp {
@@ -242,6 +257,9 @@ function handleDeleteNote(event, note) {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 14px;
+  white-space: nowrap;      /* 强制文字不换行（关键） */
+  flex: 1; /* 占据剩余空间 */
+  min-width: 0; /* 允许收缩 */
 }
 .notes-list li.active {
   background: #e6f7ff;
@@ -286,6 +304,13 @@ function handleDeleteNote(event, note) {
 .icon {
   margin-right: 8px;
   font-size: 16px;
+}
+
+/* 菜单文字布局优化 */
+.menu li span:not(.icon) {
+  white-space: nowrap;      /* 强制文字不换行（关键） */
+  overflow: hidden;         /* 超出宽度的部分隐藏（避免溢出） */
+  text-overflow: ellipsis;  /* 超出部分显示省略号（可选，更美观） */
 }
 .sidebar.collapsed .icon {
   margin-right: 0;

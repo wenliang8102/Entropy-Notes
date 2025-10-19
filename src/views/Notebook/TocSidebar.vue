@@ -171,6 +171,9 @@ onBeforeUnmount(() => {
   color: #adb5bd;
   padding: 12px 8px;
   text-align: left;
+  white-space: nowrap;      /* 强制文字不换行（关键） */
+  overflow: hidden;         /* 超出宽度的部分隐藏（避免溢出） */
+  text-overflow: ellipsis;  /* 超出部分显示省略号（可选，更美观） */
 }
 .list {
   margin: 0;
@@ -180,9 +183,9 @@ onBeforeUnmount(() => {
 .item {
   padding: 4px 8px;
   cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap;      /* 强制文字不换行（关键） */
+  overflow: hidden;         /* 超出宽度的部分隐藏（避免溢出） */
+  text-overflow: ellipsis;  /* 超出部分显示省略号（可选，更美观） */
   font-size: 16px;
   line-height: 1.6;
   text-align: left;
