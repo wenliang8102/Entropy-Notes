@@ -1,6 +1,5 @@
 <script setup>
-import { defineProps } from 'vue'
-import { watch,ref } from 'vue'
+import { defineProps, toRef } from 'vue'
 import { Dropdown, Menu, MenuItem } from 'ant-design-vue'
 import {
   CaretDownOutlined,
@@ -8,18 +7,24 @@ import {
   OrderedListOutlined,
   RollbackOutlined,
   CheckSquareOutlined,
-  AlignCenterOutlined,
-  AlignLeftOutlined,
-  AlignRightOutlined,
-  MenuUnfoldOutlined,
-  LineHeightOutlined,
   HighlightOutlined,
   ExportOutlined,
   FileImageOutlined,
+  LineHeightOutlined,
 } from '@ant-design/icons-vue'
-import { saveAs } from 'file-saver'
-import HTMLtoDOCX from 'html-to-docx-ts';
-
+import {
+  useBlockTypes,
+  fontFamilies,
+  useAlignTypes,
+  lineHeights,
+  fontSizes,
+} from '@/composables/useToolbarConfig'
+import {
+  useTextColor,
+  useImageUpload,
+  useNoteExport,
+  useFontSize,
+} from '@/composables/useEditorCommands'
 
 const props = defineProps({
   editor: {
@@ -32,151 +37,17 @@ const props = defineProps({
   },
 })
 
-const fileInput = ref(null)
 
-const triggerFileInput = () => {
-  fileInput.value?.click()
-}
+const editorRef = toRef(props, 'editor')
+const documentTitleRef = toRef(props, 'documentTitle')
 
-//  处理文件选择事件
-const handleFileChange = (event) => {
-  const file = event.target.files?.[0]
-  if (!file || !props.editor) {
-    return
-  }
 
-  // 使用 FileReader 将图片文件转换为 Base64 Data URL
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    const src = e.target?.result
-    if (src) {
-      // 调用 editor 的命令插入图片
-      props.editor.chain().focus().setImage({ src }).run()
-    }
-  }
-  reader.readAsDataURL(file)
-
-  // 清空输入框，以便下次可以选择同一个文件
-  event.target.value = ''
-}
-
-// 多级标题配置
-const blockTypes = [
-  {label: '正文', isActive: () => props.editor?.isActive('paragraph'), command: () => props.editor?.chain().focus().setParagraph().run(),},
-  {label: 'H1', level: 1, isActive: () => props.editor?.isActive('heading', { level: 1 }), command: () => props.editor?.chain().focus().toggleHeading({ level: 1 }).run(),},
-  {label: 'H2', level: 2, isActive: () => props.editor?.isActive('heading', { level: 2 }), command: () => props.editor?.chain().focus().toggleHeading({ level: 2 }).run(),},
-  {label: 'H3', level: 3, isActive: () => props.editor?.isActive('heading', { level: 3 }), command: () => props.editor?.chain().focus().toggleHeading({ level: 3 }).run(),},
-  {label: 'H4', level: 4, isActive: () => props.editor?.isActive('heading', { level: 4 }), command: () => props.editor?.chain().focus().toggleHeading({ level: 4 }).run(),},
-  {label: 'H5', level: 5, isActive: () => props.editor?.isActive('heading', { level: 5 }), command: () => props.editor?.chain().focus().toggleHeading({ level: 5 }).run(),},
-  {label: 'H6', level: 6, isActive: () => props.editor?.isActive('heading', { level: 6 }), command: () => props.editor?.chain().focus().toggleHeading({ level: 6 }).run(),},
-]
-
-// 字体配置
-const fontFamilies = [
-  { label: '默认', value: '' },
-  { label: '宋体', value: 'SimSun' },
-  { label: '黑体', value: 'SimHei' },
-  { label: '微软雅黑', value: 'Microsoft YaHei' },
-  { label: 'Arial', value: 'Arial' },
-  { label: 'Helvetica', value: 'Helvetica' },
-  { label: 'Times New Roman', value: 'Times New Roman' },
-]
-
-// 文本对齐配置
-const alignTypes = [
-  { label: '左对齐', value: 'left', icon: AlignLeftOutlined, command: () => props.editor?.chain().focus().setTextAlign('left').run() },
-  { label: '居中对齐', value: 'center', icon: AlignCenterOutlined, command: () => props.editor?.chain().focus().setTextAlign('center').run() },
-  { label: '右对齐', value: 'right', icon: AlignRightOutlined, command: () => props.editor?.chain().focus().setTextAlign('right').run() },
-  { label: '两端对齐', value: 'justify', icon: MenuUnfoldOutlined, command: () => props.editor?.chain().focus().setTextAlign('justify').run() },
-]
-
-// 行高配置
-const lineHeights = ['1', '1.5', '1.8', '2', '2.5', '3']
-
-// 字号配置
-const fontSizes = ['12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px', '48px', '64px']
-const applyFontSize = (size) => {
-  props.editor.chain().focus().setFontSize(size).run()
-}
-
-const handleExport = async (format) => {
-  if (!props.editor) return;
-
-  const title = props.documentTitle || '无标题笔记';
-  let blob;
-
-  switch (format) {
-    case 'html':
-      blob = new Blob([props.editor.getHTML()], { type: 'text/html;charset=utf-8' });
-      saveAs(blob, `${title}.html`);
-      break;
-
-    case 'md':
-      const markdownContent = props.editor.storage.markdown?.getMarkdown();
-      if (markdownContent) {
-        blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
-        saveAs(blob, `${title}.md`);
-      } else {
-        console.error('导出错误');
-      }
-      break;
-
-    case 'docx':
-      const htmlString = `
-        <!DOCTYPE html>
-        <html lang="en">
-          <head>
-            <meta charset="UTF-8" />
-            <title>${title}</title>
-          </head>
-          <body>
-            <h1>${title}</h1>
-            ${props.editor.getHTML()}
-          </body>
-        </html>
-      `;
-
-      // 直接调用库函数，完成所有转换
-      blob = await HTMLtoDOCX(htmlString, null, {
-        table: { row: { cantSplit: true } },
-        footer: true,
-        pageNumber: true,
-      });
-
-      saveAs(blob, `${title}.docx`);
-      break;
-  }
-}
-
-// 存储选中的颜色值
-const selectedColor = ref('#000000')
-const colorInputRef = ref(null)
-
-// 监听编辑器中选中文本的颜色变化，同步到选择器（fontColor 標記）
-watch(
-    () => {
-      if (!props.editor?.getAttributes) return null
-      const color = props.editor.getAttributes('fontColor')?.color
-      return color || null
-    },
-    (newColor) => {
-      if (newColor) {
-        selectedColor.value = newColor
-      }
-    },
-)
-
-// 应用颜色到选中文本（fontColor 標記）
-const applyColor = (color) => {
-  if (!props.editor) return
-  props.editor.chain().focus().setFontColor(color).run()
-}
-
-const openColorPicker = () => {
-  if (colorInputRef?.value) {
-    colorInputRef.value.click()
-  }
-}
+const blockTypes = useBlockTypes(editorRef)
+const alignTypes = useAlignTypes(editorRef)
+const { applyFontSize } = useFontSize(editorRef)
+const { selectedColor, colorInputRef, applyColor, openColorPicker } = useTextColor(editorRef)
+const { fileInput, triggerFileInput, handleFileChange } = useImageUpload(editorRef)
+const { handleExport } = useNoteExport(editorRef, documentTitleRef)
 
 </script>
 
@@ -323,7 +194,7 @@ const openColorPicker = () => {
     <Dropdown>
       <template #default>
         <button type="button">
-          <component :is="alignTypes.find(a => editor.isActive({ textAlign: a.value }))?.icon || AlignLeftOutlined" />
+          <component :is="alignTypes.find(a => editor.isActive({ textAlign: a.value }))?.icon || 'AlignLeftOutlined'" />
         </button>
       </template>
       <template #overlay>
@@ -369,6 +240,7 @@ const openColorPicker = () => {
 </template>
 
 <style scoped>
+/* 样式保持不变 */
 .toolbar {
   display: flex;
   gap: 6px;
@@ -455,5 +327,4 @@ const openColorPicker = () => {
 .toolbar :deep(.anticon-caret-down) {
   color: #ccc;
 }
-
 </style>
