@@ -14,7 +14,29 @@ const props = defineProps({
 })
 const emit = defineEmits(['toggle'])
 
+// 格式化时间戳
+function formatTimestamp(timestamp) {
+  if (!timestamp) return ''
+  const noteDate = new Date(timestamp)
+  const now = new Date()
 
+  const diffInSeconds = Math.floor((now - noteDate) / 1000)
+  const diffInMinutes = Math.floor(diffInSeconds / 60)
+  const diffInHours = Math.floor(diffInMinutes / 60)
+  const diffInDays = Math.floor(diffInHours / 24)
+
+  if (diffInSeconds < 60) {
+    return '刚刚'
+  } else if (diffInMinutes < 60) {
+    return `${diffInMinutes}分钟前`
+  } else if (diffInHours < 24 && noteDate.getDate() === now.getDate()) {
+    return `今天 ${noteDate.getHours()}:${String(noteDate.getMinutes()).padStart(2, '0')}`
+  } else if (diffInDays === 1 && noteDate.getDate() === now.getDate() - 1) {
+    return `昨天 ${noteDate.getHours()}:${String(noteDate.getMinutes()).padStart(2, '0')}`
+  } else {
+    return `${noteDate.getFullYear()}/${noteDate.getMonth() + 1}/${noteDate.getDate()}`
+  }
+}
 
 // 菜单项数据（可根据实际需求调整/支持多级菜单等）
 const menu = [
@@ -37,7 +59,6 @@ const sortedNotes = computed(() => {
 
 function handleSelectNote(noteId) {
   notesStore.setActiveNote(noteId)
-  notesStore.updateActiveNote({})
 }
 
 //  处理新建笔记
@@ -90,12 +111,15 @@ function handleDeleteNote(event, note) {
           :title="note.title"
       >
         <span class="icon">📒</span>
-        <span v-if="!isCollapsed" class="note-title">{{ note.title || '无标题笔记' }}</span>
-        <button 
-          v-if="!isCollapsed" 
-          class="delete-btn" 
-          @click="handleDeleteNote($event, note)"
-          title="删除笔记"
+        <div class="note-info" v-if="!isCollapsed">
+          <span class="note-title">{{ note.title || '无标题笔记' }}</span>
+          <span class="note-timestamp">{{ formatTimestamp(note.lastModified) }}</span>
+        </div>
+        <button
+            v-if="!isCollapsed"
+            class="delete-btn"
+            @click="handleDeleteNote($event, note)"
+            title="删除笔记"
         >
           <DeleteOutlined />
         </button>
@@ -140,7 +164,6 @@ function handleDeleteNote(event, note) {
   gap: 8px;
   font-weight: 500;
   transition: all 0.2s;
-  border: 1px solid transparent;
 }
 .new-note-btn:focus {
   outline: none; /* 清除浏览器默认的焦点边框 */
@@ -188,6 +211,22 @@ function handleDeleteNote(event, note) {
   transition: background-color 0.2s;
 }
 
+.note-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 4px; /* 标题和时间戳之间的间距 */
+}
+
+.notes-list li .note-timestamp {
+  font-size: 12px;
+  color: #888;
+}
+
+.notes-list li.active .note-timestamp {
+  color: #1890ff;
+}
+
 .notes-list::-webkit-scrollbar-thumb:hover {
   background: #bfbfbf;
 }
@@ -206,12 +245,14 @@ function handleDeleteNote(event, note) {
 .notes-list li .note-title {
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 14px;
 }
 .notes-list li.active {
   background: #e6f7ff;
   color: #1890ff;
   font-weight: bold;
 }
+
 .sidebar.collapsed .notes-list li {
   justify-content: center;
   padding: 12px 0;

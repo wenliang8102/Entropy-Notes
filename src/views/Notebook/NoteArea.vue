@@ -64,7 +64,7 @@ const editor = useEditor({
   autofocus: 'end',
   onUpdate: ({ editor }) => {
     notesStore.updateActiveNote({
-      content: editor.getJSON(), // 保存为 JSON
+      content: editor.getJSON(),
     })
   },
 })
@@ -80,9 +80,7 @@ watch(() => notesStore.activeNote, (newActiveNote, oldActiveNote) => {
   }
 
   if (newActiveNote) {
-    // 切换到新笔记，更新编辑器的标题和内容
     const newContent = newActiveNote.content || ''
-    // 更新原始标题
     originalTitle.value = newActiveNote.title || ''
 
     // 使用 setContent 会重置光标位置

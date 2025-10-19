@@ -60,15 +60,6 @@ export const useNotesStore = defineStore('notes', () => {
         activeNoteId.value = id
     }
 
-    //  处理切换笔记
-    function handleSelectNote(noteId) {
-        // 1. 设置当前激活的笔记
-        notesStore.setActiveNote(noteId)
-
-        // 2. 主动更新时间戳，确保它总能排到最前面
-        //    我们只传递一个空对象或不传参数，因为我们只想触发 lastModified 的更新
-        notesStore.updateActiveNote({})
-    }
     // 更新当前激活笔记的标题和内容
     function updateActiveNote(payload) {
         if (!activeNote.value) return
