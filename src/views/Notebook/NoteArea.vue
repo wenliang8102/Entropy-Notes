@@ -19,7 +19,8 @@ import { CustomItalic } from '../../extensions/CustomItalic.js'
 import Image from '@tiptap/extension-image'
 import { useNotesStore } from '@/stores/notes'
 
-
+//静音按钮
+const isLoadingContent = ref(false)
 //保存标题信息
 const notesStore = useNotesStore()
 // 初始化编辑器
@@ -62,10 +63,13 @@ const editor = useEditor({
   ],
   content: '',
   autofocus: 'end',
-  onUpdate: ({ editor }) => {
-    notesStore.updateActiveNote({
-      content: editor.getJSON(),
-    })
+  onUpdate: ({ editor, transaction }) => {
+    // 只有当文档内容真正被用户修改时才触发更新
+    if (!isLoadingContent.value) {
+      notesStore.updateActiveNote({
+        content: editor.getJSON(),
+      })
+    }
   },
 })
 
@@ -73,11 +77,11 @@ const editor = useEditor({
 //  监听 store 中 activeNote 的变化
 watch(() => notesStore.activeNote, (newActiveNote, oldActiveNote) => {
   if (!editor.value) return
-
-  // 如果新旧笔记是同一个，则不重新加载
   if (newActiveNote && oldActiveNote && newActiveNote.id === oldActiveNote.id) {
     return
   }
+
+  isLoadingContent.value = true
 
   if (newActiveNote) {
     const newContent = newActiveNote.content || ''
@@ -90,12 +94,24 @@ watch(() => notesStore.activeNote, (newActiveNote, oldActiveNote) => {
     originalTitle.value = ''
     editor.value.commands.clearContent()
   }
+  // 使用nextTick确保在DOM更新之后执行
+  import('vue').then(({ nextTick }) => {
+    nextTick(() => {
+      isLoadingContent.value = false
+    })
+  })
 }, )
 
 onMounted(() => {
   if (notesStore.activeNote && editor.value) {
+    isLoadingContent.value = true
     const initialContent = notesStore.activeNote.content || ''
     editor.value.commands.setContent(initialContent, false)
+    import('vue').then(({ nextTick }) => {
+      nextTick(() => {
+        isLoadingContent.value = false
+      })
+    })
   }
 })
 
