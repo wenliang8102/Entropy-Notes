@@ -8,7 +8,7 @@ import { useNoteTitle } from '@/composables/useNoteTitle'
 
 const notesStore = useNotesStore()
 
-// 使用封装好的 Composable
+
 const { editor } = useTiptapEditor(notesStore)
 const { handleTitleChange, handleTitleBlur } = useNoteTitle(notesStore)
 

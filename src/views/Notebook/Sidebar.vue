@@ -1,82 +1,54 @@
 <script setup>
-import { defineProps, defineEmits ,computed} from 'vue'
+import { defineProps, defineEmits } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { LeftOutlined, RightOutlined ,PlusOutlined, DeleteOutlined} from '@ant-design/icons-vue'
 import { useNotesStore } from '@/stores/notes'
+import { useSidebarNotes } from '@/composables/useSidebarNotes'
 
-const router = useRouter()
-const route = useRoute()
-const notesStore = useNotesStore()
 
-// 接收父组件传递的 isCollapsed 状态
 const props = defineProps({
   isCollapsed: Boolean
 })
 const emit = defineEmits(['toggle'])
 
-// 格式化时间戳
-function formatTimestamp(timestamp) {
-  if (!timestamp) return ''
-  const noteDate = new Date(timestamp)
-  const now = new Date()
+const router = useRouter()
+const route = useRoute()
 
-  const diffInSeconds = Math.floor((now - noteDate) / 1000)
-  const diffInMinutes = Math.floor(diffInSeconds / 60)
-  const diffInHours = Math.floor(diffInMinutes / 60)
-  const diffInDays = Math.floor(diffInHours / 24)
-
-  if (diffInSeconds < 60) {
-    return '刚刚'
-  } else if (diffInMinutes < 60) {
-    return `${diffInMinutes}分钟前`
-  } else if (diffInHours < 24 && noteDate.getDate() === now.getDate()) {
-    return `今天 ${noteDate.getHours()}:${String(noteDate.getMinutes()).padStart(2, '0')}`
-  } else if (diffInDays === 1 && noteDate.getDate() === now.getDate() - 1) {
-    return `昨天 ${noteDate.getHours()}:${String(noteDate.getMinutes()).padStart(2, '0')}`
-  } else {
-    return `${noteDate.getFullYear()}/${noteDate.getMonth() + 1}/${noteDate.getDate()}`
-  }
-}
-
-// 菜单项数据（可根据实际需求调整/支持多级菜单等）
+// 静态菜单数据
 const menu = [
   { name: 'Home', label: '首页', icon: '🏠' },
-  { name: '', label: '标签', icon: '🏷️' },
   { name: '', label: '设置', icon: '⚙️' }
 ]
 
-// 跳转逻辑
-const goRoute=(item)=> {
-  if (route.name !== item.name) {
+
+const goRoute = (item) => {
+  if (item.name && route.name !== item.name) {
     router.push({ name: item.name })
   }
 }
 
-const sortedNotes = computed(() => {
-  return [...notesStore.notes].sort((a, b) => b.lastModified - a.lastModified)
-})
 
 
-function handleSelectNote(noteId) {
-  notesStore.setActiveNote(noteId)
-}
+const notesStore = useNotesStore()
 
-//  处理新建笔记
-function handleCreateNote() {
-  notesStore.createNote()
-}
+const {
+  sortedNotes,
+  formatTimestamp,
+  handleCreateNote,
+  handleSelectNote,
+  handleDeleteNote,
+} = useSidebarNotes(notesStore)
 
-// 处理删除笔记
-function handleDeleteNote(event, note) {
-  event.stopPropagation() // 阻止触发点击选择笔记
-  notesStore.deleteNote(note.id)
-}
 </script>
 
 <template>
   <div :class="['sidebar', { collapsed: isCollapsed }]">
     <!-- 折叠/展开按钮 -->
-    <button class="toggle-btn" @click="emit('toggle')" type="button"> <RightOutlined v-if="isCollapsed" /> <LeftOutlined v-else /> </button>
+    <button class="toggle-btn" @click="emit('toggle')" type="button">
+      <RightOutlined v-if="isCollapsed" />
+      <LeftOutlined v-else />
+    </button>
+
     <!-- 功能菜单区 -->
     <ul class="menu">
       <li
@@ -89,6 +61,7 @@ function handleDeleteNote(event, note) {
         <span v-if="!isCollapsed">{{ item.label }}</span>
       </li>
     </ul>
+
     <!-- 新建笔记按钮 -->
     <div class="new-note-wrapper">
       <button class="new-note-btn" @click="handleCreateNote">
@@ -96,6 +69,7 @@ function handleDeleteNote(event, note) {
         <span v-if="!isCollapsed">新建笔记</span>
       </button>
     </div>
+
     <!-- 笔记列表区 -->
     <div class="notes-list-header" v-if="!isCollapsed">全部笔记</div>
     <ul class="notes-list">
@@ -114,7 +88,7 @@ function handleDeleteNote(event, note) {
         <button
             v-if="!isCollapsed"
             class="delete-btn"
-            @click="handleDeleteNote($event, note)"
+            @click="handleDeleteNote($event, note.id)"
             title="删除笔记"
         >
           <DeleteOutlined />
@@ -125,6 +99,7 @@ function handleDeleteNote(event, note) {
 </template>
 
 <style scoped>
+/* 样式保持不变 */
 .sidebar {
   width: 200px;
   transition: width 0.3s;
