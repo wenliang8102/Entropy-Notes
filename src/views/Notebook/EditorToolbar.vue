@@ -11,6 +11,7 @@ import {
   ExportOutlined,
   FileImageOutlined,
   LineHeightOutlined,
+  AlignLeftOutlined,
 } from '@ant-design/icons-vue'
 import {
   useBlockTypes,
@@ -194,7 +195,7 @@ const { handleExport } = useNoteExport(editorRef, documentTitleRef)
     <Dropdown>
       <template #default>
         <button type="button">
-          <component :is="alignTypes.find(a => editor.isActive({ textAlign: a.value }))?.icon || 'AlignLeftOutlined'" />
+          <component :is="alignTypes.find(a => editor.isActive({ textAlign: a.value }))?.icon || AlignLeftOutlined" />
         </button>
       </template>
       <template #overlay>
