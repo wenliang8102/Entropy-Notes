@@ -29,10 +29,10 @@ export const fontFamilies = [
 
 // 文本对齐配置
 export const useAlignTypes = (editor) => [
-    { label: '左对齐', value: 'left', icon: AlignLeftOutlined, command: () => editor.value?.chain().focus().setTextAlign('left').run() },
-    { label: '居中对齐', value: 'center', icon: AlignCenterOutlined, command: () => editor.value?.chain().focus().setTextAlign('center').run() },
-    { label: '右对齐', value: 'right', icon: AlignRightOutlined, command: () => editor.value?.chain().focus().setTextAlign('right').run() },
-    { label: '两端对齐', value: 'justify', icon: MenuUnfoldOutlined, command: () => editor.value?.chain().focus().setTextAlign('justify').run() },
+    { label: '左对齐', value: 'left', icon: AlignLeftOutlined, isActive: () => editor.value?.isActive({ textAlign: 'left' }), command: () => editor.value?.chain().focus().setTextAlign('left').run() },
+    { label: '居中对齐', value: 'center', icon: AlignCenterOutlined, isActive: () => editor.value?.isActive({ textAlign: 'center' }), command: () => editor.value?.chain().focus().setTextAlign('center').run() },
+    { label: '右对齐', value: 'right', icon: AlignRightOutlined, isActive: () => editor.value?.isActive({ textAlign: 'right' }), command: () => editor.value?.chain().focus().setTextAlign('right').run() },
+    { label: '两端对齐', value: 'justify', icon: MenuUnfoldOutlined, isActive: () => editor.value?.isActive({ textAlign: 'justify' }), command: () => editor.value?.chain().focus().setTextAlign('justify').run() },
 ]
 
 // 行高配置
