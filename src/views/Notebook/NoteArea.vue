@@ -5,28 +5,73 @@ import TocSidebar from './TocSidebar.vue'
 import { useNotesStore } from '@/stores/notes'
 import { useTiptapEditor } from '@/composables/useTiptapEditor'
 import { useNoteTitle } from '@/composables/useNoteTitle'
+import { computed } from 'vue'
+import { analyzeEntropy } from '../../composables/useReadability.js'
 
 const notesStore = useNotesStore()
-
 
 const { editor } = useTiptapEditor(notesStore)
 const { handleTitleChange, handleTitleBlur } = useNoteTitle(notesStore)
 
+const jsonDoc = computed(() => notesStore.activeNote?.content ?? null)
+
+function extractTextFromDoc(node) {
+  if (!node) return ''
+  if (node.type === 'text' && node.text) return node.text
+  if (Array.isArray(node.content)) {
+    return node.content.map(child => extractTextFromDoc(child)).join(' ')
+  }
+  return ''
+}
+
+const entropyInfo = computed(() => {
+  try {
+    const textFromJson = jsonDoc.value ? extractTextFromDoc(jsonDoc.value) : ''
+    const fallbackText = editor.value?.getText?.() || ''
+    const text = textFromJson && textFromJson.trim() ? textFromJson : fallbackText
+    const result = analyzeEntropy(text || '') || {}
+    return {
+      status: result.status || 'normal',
+      progress: Math.round(result.progress ?? 0),
+      warningMsg: result.message || ''
+    }
+  } catch (e) {
+    return { status: 'normal', progress: 0, warningMsg: '' }
+  }
+})
+
+const entropyLevelClass = computed(() => {
+  const p = entropyInfo.value.progress || 0
+  if (p <= 25) return 'green'
+  if (p <= 50) return 'yellow'
+  if (p <= 75) return 'orange'
+  return 'red'
+})
 </script>
 
 <template>
   <div class="note-area" v-if="notesStore.activeNote">
     <!-- 文档标题框 -->
     <div class="title-wrapper">
-      <input
-          type="text"
-          class="document-title-input"
-          placeholder="请输入标题"
-          :key="notesStore.activeNote.id"
-          :value="notesStore.activeNote.title"
-          @input="handleTitleChange"
-          @blur="handleTitleBlur"
-      />
+      <div class="title-row">
+        <input
+            type="text"
+            class="document-title-input"
+            placeholder="请输入标题"
+            :key="notesStore.activeNote.id"
+            :value="notesStore.activeNote.title"
+            @input="handleTitleChange"
+            @blur="handleTitleBlur"
+        />
+        <span class="title-divider"></span>
+        <div class="readability-inline" title="笔记可读性">
+          <div class="rb-progress">
+            <div class="rb-progress-bar" :style="{ width: entropyInfo.progress + '%' }"></div>
+          </div>
+          <span class="rb-dot" :class="entropyLevelClass"></span>
+          <div class="readability-warning" v-if="entropyInfo.warningMsg">{{ entropyInfo.warningMsg }}</div>
+        </div>
+      </div>
     </div>
 
     <!-- 传入editor 实例 -->
@@ -61,8 +106,14 @@ const { handleTitleChange, handleTitleBlur } = useNoteTitle(notesStore)
   border-bottom: 1px solid #ececec;
 }
 
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .document-title-input {
-  width: 100%;
+  flex: 1;
   border: none;
   outline: none;
   background: transparent;
@@ -74,6 +125,53 @@ const { handleTitleChange, handleTitleBlur } = useNoteTitle(notesStore)
 
 .document-title-input::placeholder {
   color: #adb5bd;
+}
+
+/* 中间竖线分隔符 */
+.title-divider {
+  width: 1px;
+  align-self: stretch;
+  background: #ececec;
+}
+
+/* 右侧可读性纯文字区域 */
+.readability-inline {
+  color: #6b7280; /* 灰色 */
+  font-size: 14px;
+  white-space: nowrap;
+}
+.rb-progress {
+  width: 160px;
+  height: 8px;
+  background: #e5e7eb; /* 灰背景 */
+  border-radius: 999px;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+.rb-progress-bar {
+  height: 100%;
+  background: #9ca3af; /* 灰色进度 */
+  transition: width 0.2s ease;
+}
+.rb-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.rb-dot.green { background: #22c55e; }
+.rb-dot.yellow { background: #eab308; }
+.rb-dot.orange { background: #f59e0b; }
+.rb-dot.red { background: #ef4444; }
+.readability-warning {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #1890ff;
+  white-space: normal; /* 允许换行，避免溢出 */
 }
 
 

@@ -296,7 +296,7 @@ const { handleExport } = useNoteExport(editorRef, documentTitleRef)
   font-weight: bold;
 }
 
-/* 颜色按钮樣式（與其他按鈕規格一致） */
+/* 颜色按钮样式 */
 .color-btn {
   position: relative;
   display: inline-flex;
@@ -320,7 +320,7 @@ const { handleExport } = useNoteExport(editorRef, documentTitleRef)
   opacity: 0;
   width: 100%;
   height: 100%;
-  pointer-events: auto; /* 讓 input 接收點擊，定位以 input 為準 */
+  pointer-events: auto;
   z-index: 1;
   cursor: pointer;
 }
