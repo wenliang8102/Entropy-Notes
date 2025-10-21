@@ -202,7 +202,7 @@ const entropyLevelClass = computed(() => {
   margin-bottom: 0.5em;
 }
 
-.editor :deep(.ProseMirror :first-child::before) {
+.editor :deep(.ProseMirror p.is-editor-empty:first-child::before) {
   content: attr(data-placeholder);
   float: left;
   color: #adb5bd;

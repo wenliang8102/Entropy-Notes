@@ -151,11 +151,14 @@ export function analyzeEntropy(text, options = {}) {
   })
   const logicRatio = logicChars / totalChars
 
-  // 4) 重复汉字比例（连续相同汉字≥3，按重复字数）→ 20%
+  // 4) 重复字符比例（连续相同字符≥3，按重复字数）→ 20%
   let repeatChars = 0
   const CJK_REPEAT = /([\u4e00-\u9fff])\1{2,}/g
-  const repeats = raw.match(CJK_REPEAT) || []
-  repeats.forEach(seq => { repeatChars += (seq.length - 1) })
+  const EN_REPEAT = /([A-Za-z])\1{2,}/g
+  const cjkRepeats = raw.match(CJK_REPEAT) || []
+  const enRepeats = raw.match(EN_REPEAT) || []
+  cjkRepeats.forEach(seq => { repeatChars += (seq.length - 1) })
+  enRepeats.forEach(seq => { repeatChars += (seq.length - 1) })
   const repeatRatio = repeatChars / totalChars
 
   // 5) 最长段落在全文中的占比（按字数）→ 12%
