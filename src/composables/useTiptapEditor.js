@@ -51,8 +51,10 @@ const editorExtensions = [
         transformPastedText: true,
         transformCopiedText: true,
     }),
+    Image.configure({
+        allowBase64: true,
+    }),
     CustomItalic,
-    Image,
 ]
 
 /**

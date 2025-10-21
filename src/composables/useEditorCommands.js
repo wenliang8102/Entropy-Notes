@@ -157,8 +157,7 @@ export function useNoteImport(editorRef) {
             reader.onload = (e) => {
                 const markdownContent = e.target?.result
                 if (markdownContent) {
-                    // tiptap-markdown 会处理 markdown 字符串
-                    editorRef.value.commands.setContent(markdownContent, true)
+                    editorRef.value.commands.setContent(markdownContent)
                 }
             }
             reader.readAsText(file)
