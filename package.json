@@ -27,6 +27,7 @@
     "ant-design-vue": "^4.2.6",
     "file-saver": "^2.0.5",
     "html-to-docx-ts": "^1.5.2",
+    "mammoth": "^1.11.0",
     "pinia": "^3.0.3",
     "tiptap-extension-line-height": "^1.0.0",
     "tiptap-markdown": "^0.9.0",

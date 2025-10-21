@@ -44,10 +44,12 @@ const editorExtensions = [
         types: ['textStyle'],
     }),
     Markdown.configure({
-        html: false,
+        html: true,
         tightLists: true,
         linkify: true,
         breaks: true,
+        transformPastedText: true,
+        transformCopiedText: true,
     }),
     CustomItalic,
     Image,

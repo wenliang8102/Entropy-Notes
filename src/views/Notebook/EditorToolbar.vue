@@ -12,6 +12,7 @@ import {
   FileImageOutlined,
   LineHeightOutlined,
   AlignLeftOutlined,
+  ImportOutlined,
 } from '@ant-design/icons-vue'
 import {
   useBlockTypes,
@@ -25,6 +26,7 @@ import {
   useImageUpload,
   useNoteExport,
   useFontSize,
+  useNoteImport,
 } from '@/composables/useEditorCommands'
 
 const props = defineProps({
@@ -49,7 +51,7 @@ const { applyFontSize } = useFontSize(editorRef)
 const { selectedColor, colorInputRef, applyColor, openColorPicker } = useTextColor(editorRef)
 const { fileInput, triggerFileInput, handleFileChange } = useImageUpload(editorRef)
 const { handleExport } = useNoteExport(editorRef, documentTitleRef)
-
+const { importFileInput, handleImport, handleImportFileChange } = useNoteImport(editorRef)
 </script>
 
 <template>
@@ -208,6 +210,32 @@ const { handleExport } = useNoteExport(editorRef, documentTitleRef)
     </Dropdown>
 
     <span class="spacer"></span>
+
+    <input
+        type="file"
+        ref="importFileInput"
+        @change="handleImportFileChange"
+        style="display: none"
+    />
+
+    <!-- 导入 -->
+    <Dropdown>
+      <template #default>
+        <button type="button" title="导入">
+          <ImportOutlined />
+        </button>
+      </template>
+      <template #overlay>
+        <Menu>
+          <MenuItem @click="handleImport('.md')">
+            从 Markdown 导入
+          </MenuItem>
+          <MenuItem @click="handleImport('.docx')">
+            从 Word 导入
+          </MenuItem>
+        </Menu>
+      </template>
+    </Dropdown>
 
     <!-- 导出 -->
     <Dropdown>

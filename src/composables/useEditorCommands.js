@@ -1,6 +1,7 @@
 import { ref, watch } from 'vue'
 import { saveAs } from 'file-saver'
 import HTMLtoDOCX from 'html-to-docx-ts'
+import mammoth from 'mammoth'
 
 /**
  * 封装颜色选择器逻辑
@@ -119,6 +120,7 @@ export function useNoteExport(editorRef, documentTitleRef) {
     return { handleExport }
 }
 
+
 /**
  * 封装字号应用逻辑
  * @param {import('vue').Ref<import('@tiptap/vue-3').Editor>} editorRef - 编辑器实例的引用
@@ -128,4 +130,59 @@ export function useFontSize(editorRef) {
         editorRef.value?.chain().focus().setFontSize(size).run()
     }
     return { applyFontSize }
+}
+
+/**
+ * 封装导入逻辑
+ * @param {import('vue').Ref<import('@tiptap/vue-3').Editor>} editorRef - 编辑器实例的引用
+ */
+export function useNoteImport(editorRef) {
+    const importFileInput = ref(null)
+
+    const handleImport = (acceptType) => {
+        if (importFileInput.value) {
+            importFileInput.value.accept = acceptType
+            importFileInput.value.click()
+        }
+    }
+
+    const handleImportFileChange = (event) => {
+        const file = event.target.files?.[0]
+        if (!file || !editorRef.value) return
+
+        const reader = new FileReader()
+        const fileType = file.name.split('.').pop().toLowerCase()
+
+        if (fileType === 'md') {
+            reader.onload = (e) => {
+                const markdownContent = e.target?.result
+                if (markdownContent) {
+                    // tiptap-markdown 会处理 markdown 字符串
+                    editorRef.value.commands.setContent(markdownContent, true)
+                }
+            }
+            reader.readAsText(file)
+        } else if (fileType === 'docx') {
+            reader.onload = async (e) => {
+                const arrayBuffer = e.target?.result
+                if (arrayBuffer) {
+                    try {
+                        const result = await mammoth.convertToHtml({ arrayBuffer })
+                        editorRef.value.commands.clearContent(false);
+                        editorRef.value.commands.insertContent(result.value);
+                    } catch (error) {
+                        console.error('导入 DOCX 失败:', error)
+                        alert('导入 DOCX 文件失败。请确保文件格式正确。')
+                    }
+                }
+            }
+            reader.readAsArrayBuffer(file)
+        } else {
+            alert('不支持的文件类型。请选择 .md 或 .docx 文件。')
+        }
+
+        event.target.value = ''
+    }
+
+    return { importFileInput, handleImport, handleImportFileChange }
 }
