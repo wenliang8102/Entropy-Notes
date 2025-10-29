@@ -5,8 +5,11 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // --- 新增 base 配置 ---
+  base: '/Entropy-Notes/',
+  // --- 新增配置结束 ---
   plugins: [
-      vue(),
+    vue(),
     nodePolyfills({
       globals: {
         Buffer: true,

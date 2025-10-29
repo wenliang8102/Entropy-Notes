@@ -4,14 +4,7 @@ import HTMLtoDOCX from 'html-to-docx-ts'
 import { renderAsync } from 'docx-preview'
 
 /**
- * 将 docx-preview 生成的 HTML 规范化为 Tiptap 更容易解析的标签：
- * - 粗体 => <strong>
- * - 斜体 => <em>
- * - 下划线 => <u>
- * - 删除线 => <s>
- * - 高亮（背景色）=> <mark style="background-color: ...">
- * - 文本颜色 => <span style="color: ...">
- * 并剥离 docx/page 等非内容包装容器
+ * 将 docx-preview 生成的 HTML 规范化为 Tiptap 更容易解析的标签
  */
 function normalizeDocxPreviewHtml(html) {
     try {
@@ -243,7 +236,7 @@ export function useFontSize(editorRef) {
 }
 
 /**
- * 导入（MD / DOCX，DOCX 用 docx-preview，高保真 + 规范化，无表格支持）
+ * 导入
  */
 export function useNoteImport(editorRef) {
     const importFileInput = ref(null)
@@ -274,19 +267,15 @@ export function useNoteImport(editorRef) {
             try {
                 const arrayBuffer = await fileReaderArrayBuffer(file)
 
-                // 离屏渲染（不要 display:none，避免布局计算为 0）
                 const offscreen = document.createElement('div')
                 offscreen.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;pointer-events:none;'
                 document.body.appendChild(offscreen)
 
-                // 关键修复：把 options 放到第 4 个参数，第三个参数（styleContainer）传 undefined
+
                 await renderAsync(arrayBuffer, offscreen, undefined, {
-                    // 可按需配置：className, inWrapper 等
-                    // className: 'docx',
-                    // inWrapper: true,
+
                 })
 
-                // 将 blob: 图片 -> dataURL（保持不变）
                 const imgs = offscreen.querySelectorAll('img[src^="blob:"]')
                 await Promise.all(
                     Array.from(imgs).map(async (img) => {
