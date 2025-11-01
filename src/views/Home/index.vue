@@ -1,71 +1,61 @@
 <template>
-    <div class="square-container">
-      <!-- 三层正方形 -->
-      <div class="square square-white"></div>
-      <div class="square square-light-blue"></div>
-      <div class="square square-deep-blue"></div>
+  <div class="square-container">
+    <!-- 三层正方形 -->
+    <div class="square square-white"></div>
+    <div class="square square-light-blue"></div>
+    <div class="square square-deep-blue"></div>
 
-      <img class="logo" src="/logo.png">
-      <!-- 左侧文案 -->
-      <div class="hero">
-        <div class="hero-title">Entropy notes</div>
-        <div class="hero-subtitle">笔记熵减，知识赋能</div>
-      </div>
-      <!-- 登录表单 -->
-      <div class="login-form-container">
-        <form class="login-form" @submit.prevent="handleLogin">
-          <!-- Logo区域 -->
-          <div class="logo-container">
-            <div class="logo-text">Entropy notes</div>
-          </div>
-          
-          <div class="form-group">
-            <div class="form-row">
-              <label class="form-label">用户名</label>
-              <input type="text" class="form-input" v-model="formData.username" required/>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <div class="form-row">
-              <label class="form-label">密码</label>
-              <input type="password" class="form-input" v-model="formData.password" required/>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <div class="form-row">
-              <label class="form-label">验证码</label>
-              <div class="captcha-group">
-                <input type="text" class="form-input captcha-input" v-model="formData.captcha" />
-                <img class="captcha-img" src="/captcha.png" alt="captcha" />
-              </div>
-            </div>
-          </div>
-          
-          <div class="form-options">
-            <label class="checkbox-label">
-              <input type="checkbox" class="checkbox" v-model="formData.rememberPassword" />
-              <span class="checkbox-text">记住密码</span>
-            </label>
-            <div class="links">
-              <a href="#" class="link" @click.prevent="handleNoAccount">没有账户?</a>
-              <a href="#" class="link register-link" @click.prevent="handleRegister">马上注册</a>
-            </div>
-          </div>
-
-          <div v-if="authStore.authError" class="error-message">{{ authStore.authError }}</div>
-
-          <button type="button" class="login-btn" @click="handleLogin">登 录</button>
-        </form>
-      </div>
+    <img class="logo" src="/logo.png">
+    <!-- 左侧文案 -->
+    <div class="hero">
+      <div class="hero-title">Entropy notes</div>
+      <div class="hero-subtitle">笔记熵减，知识赋能</div>
     </div>
+    <!-- 登录表单 -->
+    <div class="login-form-container">
+      <form class="login-form" @submit.prevent="handleLogin">
+        <!-- Logo区域 -->
+        <div class="logo-container">
+          <div class="logo-text">Entropy notes</div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-row">
+            <label class="form-label">用户名</label>
+            <input type="text" class="form-input" v-model="formData.username" required/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-row">
+            <label class="form-label">密码</label>
+            <input type="password" class="form-input" v-model="formData.password" required/>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" class="checkbox" v-model="formData.rememberPassword" />
+            <span class="checkbox-text">记住密码</span>
+          </label>
+          <div class="links">
+            <a href="#" class="link" @click.prevent="handleNoAccount">没有账户?</a>
+            <a href="#" class="link register-link" @click.prevent="handleRegister">马上注册</a>
+          </div>
+        </div>
+
+        <button type="button" class="login-btn" @click="handleLogin">登 录</button>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { notification } from 'ant-design-vue'
+import { translateMessage } from '@/utils/translator'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -74,34 +64,63 @@ const authStore = useAuthStore()
 const formData = ref({
   username: '',
   password: '',
-  captcha: '',
   rememberPassword: false
+})
+
+// 显示通知的函数
+const showNotification = (type, message, description) => {
+  notification[type]({
+    message: message,
+    description: description,
+    placement: 'top',
+    duration: 3,
+    style: {
+      marginTop: '24px'
+    }
+  })
+}
+
+// 监听登录错误
+watch(() => authStore.authError, (newError) => {
+  if (newError) {
+    showNotification('error', '登录失败', translateMessage(newError))
+  }
 })
 
 // 登录处理
 async function handleLogin() {
   if (!formData.value.username || !formData.value.password) {
-    alert('请输入用户名和密码');
+    showNotification('warning', '提示', '请输入用户名和密码')
     return;
   }
-  await authStore.login(formData.value.username, formData.value.password)
+  const result = await authStore.login(formData.value.username, formData.value.password)
+  if (result?.success) {
+    showNotification('success', '登录成功', '正在跳转...')
+    // 延迟跳转，让用户看到成功提示
+    setTimeout(() => {
+      router.push('/notebook')
+    }, 500)
+  }
 }
 
 // 注册处理
 async function handleRegister() {
   if (!formData.value.username || !formData.value.password) {
-    alert('请输入用户名和密码');
+    showNotification('warning', '提示', '请输入用户名和密码')
     return;
   }
-  const success = await authStore.register(formData.value.username, formData.value.password);
-  if (success) {
+  const result = await authStore.register(formData.value.username, formData.value.password);
+  if (result.success) {
+    showNotification('success', '注册成功', translateMessage(result.message) || '请现在登录')
     // 注册成功后，可以清空表单，让用户登录
     formData.value.password = '';
+  } else if (result.error) {
+    showNotification('error', '注册失败', translateMessage(result.error))
   }
 }
 
 function handleNoAccount() {
-  alert('请在右侧点击“马上注册”来创建新账户。');
+  showNotification('info', '提示', '请在右侧点击"马上注册"来创建新账户。')
 }
 </script>
 
@@ -221,7 +240,7 @@ function handleNoAccount() {
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 2vh;
+  gap: 2.5vh;
 }
 
 /* Logo容器 */
@@ -229,7 +248,7 @@ function handleNoAccount() {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin-bottom: 1vh;
+  margin-bottom: 3vh;
   padding-right: 0;
 }
 
@@ -247,7 +266,7 @@ function handleNoAccount() {
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.8vh;
+  gap: 0.5vh;
 }
 
 .form-row {
@@ -268,39 +287,20 @@ function handleNoAccount() {
 
 .form-input {
   flex: 1;
-  height: 4vh;
-  border: 1px solid #E0E0E0;
-  border-radius: 0.8vh;
+  height: 4.5vh;
+  border: 1.5px solid #E0E0E0;
+  border-radius: 1vh;
   padding: 0 1.2vw;
   font-size: 1.1vw;
   box-sizing: border-box;
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
   background: white;
 }
 
 .form-input:focus {
   border-color: #4080ff;
-}
-
-/* 验证码组 */
-.captcha-group {
-  display: grid;
-  grid-template-columns: 70% 1fr;
-  align-items: center;
-  column-gap: 1vw;
-  width: 100%;
-}
-
-.captcha-input {
-  width: 100%;
-}
-
-.captcha-img {
-  width: 8vh;
-  height: 4vh;
-  object-fit: contain;
-  user-select: none;
+  box-shadow: 0 0 0 2px rgba(64, 128, 255, 0.1);
 }
 
 /* 表单选项 */
@@ -308,7 +308,7 @@ function handleNoAccount() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 1vh 0;
+  margin: 1.5vh 0 0.5vh 0;
 }
 
 .checkbox-label {
@@ -355,30 +355,33 @@ function handleNoAccount() {
 
 /* 登录按钮 */
 .login-btn {
-  width: 60%;
-  height: 7vh;
-  background: #1d96d9;
+  width: 65%;
+  height: 6.5vh;
+  background: linear-gradient(135deg, #1d96d9 0%, #4080ff 100%);
   color: white;
   border: none;
-  border-radius: 4vh;
-  font-size: 1.8vw;
+  border-radius: 3.5vh;
+  font-size: 1.6vw;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
-  margin-top: 1.5vh;
+  transition: all 0.3s ease;
+  margin-top: 2vh;
   font-family: sans-serif;
   margin-left: auto;
   margin-right: auto;
-  padding: 1vh;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(29, 150, 217, 0.3);
 }
 
 .login-btn:hover {
-  background: #67bff0;
-  transform: translateY(-0.1vh);
+  background: linear-gradient(135deg, #67bff0 0%, #5a9aff 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(29, 150, 217, 0.4);
 }
 
 .login-btn:active {
   transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(29, 150, 217, 0.3);
 }
 
 /* 响应式调整 */
@@ -388,7 +391,7 @@ function handleNoAccount() {
     max-width: 75vw;
     top: 60%;
   }
-  
+
   .logo {
     width: 10vh;
     height: 10vh;
@@ -404,42 +407,34 @@ function handleNoAccount() {
     margin-top: 4vh;
     font-size: 4.2vw;
   }
-  
+
   .form-label {
     font-size: 3vw;
     width: 7vw; /* 移动端标签宽度 */
   }
-  
+
   .form-row {
     gap: 4vw; /* 移动端也增加间距 */
   }
-  
+
   .logo-text {
     font-size: 6.5vw; /* 移动端字体也调大 */
   }
-  
+
   .form-input {
     height: 6vh;
     font-size: 3vw;
   }
-  .captcha-group {
-    grid-template-columns: 60% 1fr; /* 移動端同樣 60% */
-    column-gap: 2.5vw;
-  }
-  
-  .captcha-img {
-    width: 15vw;
-    height: 6vh;
-  }
-  
+
   .checkbox-text,
   .link {
     font-size: 2.5vw;
   }
-  
+
   .login-btn {
-    height: 7vh;
+    height: 6.5vh;
     font-size: 3.5vw;
+    width: 70%;
   }
 }
 </style>

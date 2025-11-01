@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { LeftOutlined, RightOutlined ,PlusOutlined, DeleteOutlined} from '@ant-design/icons-vue'
+import { LeftOutlined, RightOutlined ,PlusOutlined, DeleteOutlined, HomeOutlined, SettingOutlined, BookOutlined} from '@ant-design/icons-vue'
 import { useNotesStore } from '@/stores/notes'
 import { useSidebarNotes } from '@/composables/useSidebarNotes'
 
@@ -16,8 +16,8 @@ const route = useRoute()
 
 // 静态菜单数据
 const menu = [
-  { name: 'Home', label: '首页', icon: '🏠' },
-  { name: '', label: '设置', icon: '⚙️' }
+  { name: 'Home', label: '首页', icon: HomeOutlined },
+  { name: '', label: '设置', icon: SettingOutlined }
 ]
 
 
@@ -57,7 +57,9 @@ const {
           :class="{ active: route.name === item.name }"
           @click="goRoute(item)"
       >
-        <span v-if="item.icon" class="icon">{{ item.icon }}</span>
+        <span v-if="item.icon" class="icon">
+          <component :is="item.icon" />
+        </span>
         <span v-if="!isCollapsed">{{ item.label }}</span>
       </li>
     </ul>
@@ -80,7 +82,9 @@ const {
           @click="handleSelectNote(note.id)"
           :title="note.title"
       >
-        <span class="icon">📒</span>
+        <span class="icon">
+          <BookOutlined />
+        </span>
         <div class="note-info" v-if="!isCollapsed">
           <span class="note-title">{{ note.title || '无标题笔记' }}</span>
           <span class="note-timestamp">{{ formatTimestamp(note.lastModified) }}</span>
@@ -242,6 +246,14 @@ const {
   font-weight: bold;
 }
 
+.notes-list li.active .icon {
+  color: #1890ff;
+}
+
+.notes-list li.active .icon :deep(svg) {
+  color: #1890ff;
+}
+
 .sidebar.collapsed .notes-list li {
   justify-content: center;
   padding: 12px 0;
@@ -276,9 +288,26 @@ const {
   color: #1890ff;
   font-weight: bold;
 }
+
+.menu li.active .icon {
+  color: #1890ff;
+}
+
+.menu li.active .icon :deep(svg) {
+  color: #1890ff;
+}
 .icon {
   margin-right: 8px;
   font-size: 16px;
+  color: #1890ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon :deep(svg) {
+  font-size: 16px;
+  color: #1890ff;
 }
 
 /* 菜单文字布局优化 */
