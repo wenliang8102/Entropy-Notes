@@ -13,7 +13,7 @@
       </div>
       <!-- 登录表单 -->
       <div class="login-form-container">
-        <form class="login-form">
+        <form class="login-form" @submit.prevent="handleLogin">
           <!-- Logo区域 -->
           <div class="logo-container">
             <div class="logo-text">Entropy notes</div>
@@ -22,14 +22,14 @@
           <div class="form-group">
             <div class="form-row">
               <label class="form-label">用户名</label>
-              <input type="text" class="form-input" v-model="formData.username" />
+              <input type="text" class="form-input" v-model="formData.username" required/>
             </div>
           </div>
           
           <div class="form-group">
             <div class="form-row">
               <label class="form-label">密码</label>
-              <input type="password" class="form-input" v-model="formData.password" />
+              <input type="password" class="form-input" v-model="formData.password" required/>
             </div>
           </div>
           
@@ -53,6 +53,9 @@
               <a href="#" class="link register-link" @click.prevent="handleRegister">马上注册</a>
             </div>
           </div>
+
+          <div v-if="authStore.authError" class="error-message">{{ authStore.authError }}</div>
+
           <button type="button" class="login-btn" @click="handleLogin">登 录</button>
         </form>
       </div>
@@ -62,8 +65,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 // 表单数据
 const formData = ref({
@@ -73,25 +78,30 @@ const formData = ref({
   rememberPassword: false
 })
 
-// 事件处理函数（预留）
-function handleLogin() {
-  console.log('登录数据:', formData.value)
-  // TODO: 实现登录逻辑
-  router.push('/notebook')
+// 登录处理
+async function handleLogin() {
+  if (!formData.value.username || !formData.value.password) {
+    alert('请输入用户名和密码');
+    return;
+  }
+  await authStore.login(formData.value.username, formData.value.password)
+}
+
+// 注册处理
+async function handleRegister() {
+  if (!formData.value.username || !formData.value.password) {
+    alert('请输入用户名和密码');
+    return;
+  }
+  const success = await authStore.register(formData.value.username, formData.value.password);
+  if (success) {
+    // 注册成功后，可以清空表单，让用户登录
+    formData.value.password = '';
+  }
 }
 
 function handleNoAccount() {
-  console.log('没有账户')
-  // TODO: 实现没有账户的处理逻辑
-}
-
-function handleRegister() {
-  console.log('马上注册')
-  // TODO: 实现注册逻辑
-}
-
-function goNotebook() {
-  router.push('/notebook')
+  alert('请在右侧点击“马上注册”来创建新账户。');
 }
 </script>
 
