@@ -73,7 +73,7 @@ const showNotification = (type, message, description) => {
     message: message,
     description: description,
     placement: 'top',
-    duration: 3,
+    duration: 1,
     style: {
       marginTop: '24px'
     }

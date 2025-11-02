@@ -7,6 +7,7 @@ import { useTiptapEditor } from '@/composables/useTiptapEditor'
 import { useNoteTitle } from '@/composables/useNoteTitle'
 import { computed } from 'vue'
 import { analyzeEntropy } from '../../composables/useReadability.js'
+import { formatTimestamp } from '@/composables/useSidebarNotes'
 
 const notesStore = useNotesStore()
 
@@ -47,10 +48,115 @@ const entropyLevelClass = computed(() => {
   if (p <= 75) return 'orange'
   return 'red'
 })
+
+// 回收站笔记列表（按删除时间排序）
+const sortedTrashNotes = computed(() => {
+  const trashNotes = notesStore.notes.filter(n => n.deletedAt)
+  return [...trashNotes].sort((a, b) => {
+    const aTime = a.deletedAt ? new Date(a.deletedAt).getTime() : 0
+    const bTime = b.deletedAt ? new Date(b.deletedAt).getTime() : 0
+    return bTime - aTime
+  })
+})
+
+// 计算剩余删除天数（7天后自动删除）
+function getDaysUntilPermanentDelete(deletedAt) {
+  if (!deletedAt) return null
+  
+  const now = Date.now()
+  const deletedTime = new Date(deletedAt).getTime()
+  const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000
+  const elapsed = now - deletedTime
+  const remaining = sevenDaysInMs - elapsed
+  
+  if (remaining <= 0) {
+    return { days: 0, hours: 0, expired: true }
+  }
+  
+  const days = Math.floor(remaining / (24 * 60 * 60 * 1000))
+  const hours = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000))
+  
+  return { days, hours, expired: false }
+}
+
+// 格式化剩余时间显示
+function formatRemainingTime(deletedAt) {
+  const timeInfo = getDaysUntilPermanentDelete(deletedAt)
+  if (!timeInfo) return '未知'
+  
+  if (timeInfo.expired) {
+    return '已过期'
+  }
+  
+  if (timeInfo.days > 0) {
+    return timeInfo.hours > 0 
+      ? `剩余 ${timeInfo.days} 天 ${timeInfo.hours} 小时`
+      : `剩余 ${timeInfo.days} 天`
+  } else {
+    return `剩余 ${timeInfo.hours} 小时`
+  }
+}
+
+// 获取剩余时间的样式类（根据剩余天数返回不同颜色）
+function getExpiryClass(deletedAt) {
+  const timeInfo = getDaysUntilPermanentDelete(deletedAt)
+  if (!timeInfo || timeInfo.expired) return 'expired'
+  
+  if (timeInfo.days <= 1) return 'urgent' // 1天以内：紧急（红色）
+  if (timeInfo.days <= 3) return 'warning' // 3天以内：警告（橙色）
+  return 'normal' // 3天以上：正常（灰色）
+}
 </script>
 
 <template>
-  <div class="note-area" v-if="notesStore.activeNote">
+  <!-- 回收站视图：显示已删除笔记列表 -->
+  <div class="trash-view" v-if="notesStore.viewMode === 'trash'">
+    <div class="trash-header">
+      <h2>回收站</h2>
+      <p class="trash-count">共 {{ sortedTrashNotes.length }} 条已删除笔记</p>
+    </div>
+    <div class="trash-list" v-if="sortedTrashNotes.length > 0">
+      <div
+        v-for="note in sortedTrashNotes"
+        :key="note.id"
+        class="trash-item"
+        :class="{ active: note.id === notesStore.activeNoteId }"
+      >
+        <div class="trash-item-content" @click="notesStore.setActiveNote(note.id)">
+          <h3 class="trash-item-title">{{ note.title || '无标题笔记' }}</h3>
+          <p class="trash-item-meta">
+            <span>删除时间：{{ note.deletedAt ? formatTimestamp(new Date(note.deletedAt).getTime()) : '未知' }}</span>
+            <span v-if="note.updatedAt">修改时间：{{ formatTimestamp(new Date(note.updatedAt).getTime()) }}</span>
+          </p>
+          <p class="trash-item-expiry" :class="getExpiryClass(note.deletedAt)">
+            {{ formatRemainingTime(note.deletedAt) }}后自动删除
+          </p>
+        </div>
+        <div class="trash-item-actions">
+          <button
+            class="restore-btn"
+            @click.stop="notesStore.restoreNote(note.id)"
+            title="恢复笔记"
+          >
+            恢复
+          </button>
+          <button
+            class="delete-btn"
+            @click.stop="notesStore.deleteNote(note.id)"
+            title="彻底删除"
+          >
+            彻底删除
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="trash-empty" v-else>
+      <p>回收站是空的</p>
+    </div>
+  </div>
+
+  <!-- 正常笔记视图 -->
+  <div class="note-area" v-else-if="notesStore.activeNote">
     <!-- 文档标题框 -->
     <div class="title-wrapper">
       <div class="title-row">
@@ -267,5 +373,167 @@ const entropyLevelClass = computed(() => {
 }
 .empty-content p {
   font-size: 1.2em;
+}
+
+/* 回收站视图样式 */
+.trash-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  overflow-y: auto;
+}
+
+.trash-header {
+  padding: 24px 32px;
+  border-bottom: 1px solid #ececec;
+  background: #fafafa;
+}
+
+.trash-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #213547;
+}
+
+.trash-count {
+  margin: 0;
+  font-size: 14px;
+  color: #888;
+}
+
+.trash-list {
+  flex: 1;
+  padding: 16px 32px;
+  overflow-y: auto;
+}
+
+.trash-item {
+  position: relative;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trash-item:hover {
+  border-color: #91d5ff;
+  background: #f0f9ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+}
+
+.trash-item.active {
+  border-color: #1890ff;
+  background: #e6f7ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+}
+
+.trash-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.trash-item-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #213547;
+}
+
+.trash-item-meta {
+  margin: 0;
+  font-size: 13px;
+  color: #888;
+  display: flex;
+  gap: 16px;
+}
+
+.trash-item-expiry {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.trash-item-expiry.normal {
+  color: #888;
+}
+
+.trash-item-expiry.warning {
+  color: #faad14;
+}
+
+.trash-item-expiry.urgent {
+  color: #ff4d4f;
+}
+
+.trash-item-expiry.expired {
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+.trash-empty {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #adb5bd;
+  font-size: 16px;
+}
+
+.trash-item-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 16px;
+  flex-shrink: 0;
+}
+
+.restore-btn,
+.delete-btn {
+  padding: 6px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.restore-btn {
+  color: #52c41a;
+  border-color: #52c41a;
+}
+
+.restore-btn:hover {
+  background: #f6ffed;
+  border-color: #73d13d;
+  color: #389e0d;
+}
+
+.delete-btn {
+  color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+.delete-btn:hover {
+  background: #fff2f0;
+  border-color: #ff7875;
+  color: #cf1322;
+}
+
+.restore-btn:focus,
+.delete-btn:focus {
+  outline: none;
 }
 </style>
