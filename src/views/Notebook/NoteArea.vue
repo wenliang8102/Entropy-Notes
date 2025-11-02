@@ -8,11 +8,20 @@ import { useNoteTitle } from '@/composables/useNoteTitle'
 import { computed } from 'vue'
 import { analyzeEntropy } from '../../composables/useReadability.js'
 import { formatTimestamp } from '@/composables/useSidebarNotes'
+import { useTrash } from '@/composables/useTrash'
 
 const notesStore = useNotesStore()
 
 const { editor } = useTiptapEditor(notesStore)
 const { handleTitleChange, handleTitleBlur } = useNoteTitle(notesStore)
+
+// 回收站相关功能
+const {
+  sortedTrashNotes,
+  formatRemainingTime,
+  getExpiryClass,
+  isTrashView,
+} = useTrash(notesStore)
 
 const jsonDoc = computed(() => notesStore.activeNote?.content ?? null)
 
@@ -49,68 +58,11 @@ const entropyLevelClass = computed(() => {
   return 'red'
 })
 
-// 回收站笔记列表（按删除时间排序）
-const sortedTrashNotes = computed(() => {
-  const trashNotes = notesStore.notes.filter(n => n.deletedAt)
-  return [...trashNotes].sort((a, b) => {
-    const aTime = a.deletedAt ? new Date(a.deletedAt).getTime() : 0
-    const bTime = b.deletedAt ? new Date(b.deletedAt).getTime() : 0
-    return bTime - aTime
-  })
-})
-
-// 计算剩余删除天数（7天后自动删除）
-function getDaysUntilPermanentDelete(deletedAt) {
-  if (!deletedAt) return null
-  
-  const now = Date.now()
-  const deletedTime = new Date(deletedAt).getTime()
-  const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000
-  const elapsed = now - deletedTime
-  const remaining = sevenDaysInMs - elapsed
-  
-  if (remaining <= 0) {
-    return { days: 0, hours: 0, expired: true }
-  }
-  
-  const days = Math.floor(remaining / (24 * 60 * 60 * 1000))
-  const hours = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000))
-  
-  return { days, hours, expired: false }
-}
-
-// 格式化剩余时间显示
-function formatRemainingTime(deletedAt) {
-  const timeInfo = getDaysUntilPermanentDelete(deletedAt)
-  if (!timeInfo) return '未知'
-  
-  if (timeInfo.expired) {
-    return '已过期'
-  }
-  
-  if (timeInfo.days > 0) {
-    return timeInfo.hours > 0 
-      ? `剩余 ${timeInfo.days} 天 ${timeInfo.hours} 小时`
-      : `剩余 ${timeInfo.days} 天`
-  } else {
-    return `剩余 ${timeInfo.hours} 小时`
-  }
-}
-
-// 获取剩余时间的样式类（根据剩余天数返回不同颜色）
-function getExpiryClass(deletedAt) {
-  const timeInfo = getDaysUntilPermanentDelete(deletedAt)
-  if (!timeInfo || timeInfo.expired) return 'expired'
-  
-  if (timeInfo.days <= 1) return 'urgent' // 1天以内：紧急（红色）
-  if (timeInfo.days <= 3) return 'warning' // 3天以内：警告（橙色）
-  return 'normal' // 3天以上：正常（灰色）
-}
 </script>
 
 <template>
   <!-- 回收站视图：显示已删除笔记列表 -->
-  <div class="trash-view" v-if="notesStore.viewMode === 'trash'">
+  <div class="trash-view" v-if="isTrashView">
     <div class="trash-header">
       <h2>回收站</h2>
       <p class="trash-count">共 {{ sortedTrashNotes.length }} 条已删除笔记</p>
