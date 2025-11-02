@@ -45,13 +45,6 @@ export function useSidebarNotes(notesStore) {
         if (notesStore.viewMode === 'trash') {
             // 回收站：只显示已删除的笔记（有 deletedAt 字段）
             filtered = filtered.filter(n => n.deletedAt)
-        } else {
-            // 正常视图：只显示未删除的笔记（没有 deletedAt 或 deletedAt 为 null）
-            filtered = filtered.filter(n => !n.deletedAt)
-        }
-        
-        // 排序
-        if (notesStore.viewMode === 'trash') {
             // 回收站按删除时间排序
             return filtered.sort((a, b) => {
                 const aTime = a.deletedAt ? new Date(a.deletedAt).getTime() : 0
@@ -59,6 +52,8 @@ export function useSidebarNotes(notesStore) {
                 return bTime - aTime
             })
         } else {
+            // 正常视图：只显示未删除的笔记（没有 deletedAt 或 deletedAt 为 null）
+            filtered = filtered.filter(n => !n.deletedAt)
             // 正常笔记按修改时间排序
             return filtered.sort((a, b) => b.lastModified - a.lastModified)
         }

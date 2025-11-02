@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { LeftOutlined, RightOutlined ,PlusOutlined, DeleteOutlined, HomeOutlined, SettingOutlined, BookOutlined} from '@ant-design/icons-vue'
 import { useNotesStore } from '@/stores/notes'
 import { useSidebarNotes } from '@/composables/useSidebarNotes'
+import { useTrash } from '@/composables/useTrash'
 
 
 const props = defineProps({
@@ -21,28 +22,6 @@ const menu = [
   { name: '', label: '回收站', icon: DeleteOutlined }
 ]
 
-
-const goRoute = (item) => {
-  // 如果是回收站，切换视图模式（如果已经在回收站，则切回正常视图）
-  if (item.label === '回收站') {
-    if (notesStore.viewMode === 'trash') {
-      notesStore.setViewMode('notes')
-    } else {
-      notesStore.setViewMode('trash')
-    }
-  } else {
-    // 如果从回收站视图点击其他菜单项，切换回正常视图
-    if (notesStore.viewMode === 'trash') {
-      notesStore.setViewMode('notes')
-    }
-    if (item.name && route.name !== item.name) {
-      router.push({ name: item.name })
-    }
-  }
-}
-
-
-
 const notesStore = useNotesStore()
 
 const {
@@ -52,6 +31,28 @@ const {
   handleSelectNote,
   handleDeleteNote,
 } = useSidebarNotes(notesStore)
+
+// 回收站相关功能
+const {
+  toggleTrashView,
+  isTrashView,
+  listHeader,
+} = useTrash(notesStore)
+
+const goRoute = (item) => {
+  // 如果是回收站，切换视图模式（如果已经在回收站，则切回正常视图）
+  if (item.label === '回收站') {
+    toggleTrashView()
+  } else {
+    // 如果从回收站视图点击其他菜单项，切换回正常视图
+    if (isTrashView.value) {
+      notesStore.setViewMode('notes')
+    }
+    if (item.name && route.name !== item.name) {
+      router.push({ name: item.name })
+    }
+  }
+}
 
 </script>
 
@@ -68,7 +69,7 @@ const {
       <li
           v-for="item in menu"
           :key="item.name || item.label"
-          :class="{ active: item.label === '回收站' ? notesStore.viewMode === 'trash' : route.name === item.name }"
+          :class="{ active: item.label === '回收站' ? isTrashView : route.name === item.name }"
           @click="goRoute(item)"
       >
         <span v-if="item.icon" class="icon">
@@ -79,7 +80,7 @@ const {
     </ul>
 
     <!-- 新建笔记按钮（回收站视图下不显示） -->
-    <div class="new-note-wrapper" v-if="notesStore.viewMode !== 'trash'">
+    <div class="new-note-wrapper" v-if="!isTrashView">
       <button class="new-note-btn" @click="handleCreateNote">
         <PlusOutlined />
         <span v-if="!isCollapsed">新建笔记</span>
@@ -88,7 +89,7 @@ const {
 
     <!-- 笔记列表区 -->
     <div class="notes-list-header" v-if="!isCollapsed">
-      {{ notesStore.viewMode === 'trash' ? '回收站' : '全部笔记' }}
+      {{ listHeader }}
     </div>
     <ul class="notes-list">
       <li
