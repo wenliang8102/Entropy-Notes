@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-// 创建一个 axios 实例
+
 const apiClient = axios.create({
-    baseURL: 'http://8.138.220.50:3000/api', // 后端 API 基础 URL
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     headers: {
-        'Content-Type': 'application/json',
-    },
+        'Content-Type': 'application/json'
+    }
 });
 
 // 添加请求拦截器
