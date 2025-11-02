@@ -231,7 +231,7 @@ export function analyzeEntropy(text, options = {}) {
   else if (poorDistribution) message = '核心关键词分布不均'
   else if (lowRelevance) message = '关键词与主题关联度低'
   else if (logicRatio <= 0.005) message = '逻辑词偏少'
-  else message = `文本结构清晰（熵值:${entropy}）`
+  else message = `文本结构清晰（熵值：${entropy}）`
 
   const status = entropy > 50 ? 'warning' : 'normal'
   return { status, progress: entropy, message }

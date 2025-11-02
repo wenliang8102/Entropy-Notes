@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { authApi } from '@/services/api';
 import { useNotesStore } from './notes'; // 引入 notes store
+import { translateMessage } from '@/utils/translator'; // 引入翻译函数
 
 export const useAuthStore = defineStore('auth', () => {
     const router = useRouter();
@@ -23,14 +24,16 @@ export const useAuthStore = defineStore('auth', () => {
             if (response.data.token) {
                 // 登录成功
                 setAuthData(response.data.token);
-                router.push('/notebook'); // 跳转到笔记页面
+                return { success: true, message: '登录成功' };
             } else {
                 // 后端返回了非预期的数据结构
                 throw new Error(response.data.message || '登录失败，响应格式不正确');
             }
         } catch (error) {
-            authError.value = error.response?.data?.message || error.message || '登录时发生未知错误';
+            const rawMessage = error.response?.data?.message || error.message || '登录时发生未知错误';
+            authError.value = translateMessage(rawMessage);
             console.error('Login failed:', authError.value);
+            return { success: false };
         }
     }
 
@@ -38,13 +41,22 @@ export const useAuthStore = defineStore('auth', () => {
         authError.value = null;
         try {
             const response = await authApi.register(username, password);
-            // 注册成功后可以提示用户去登录
-            alert(response.data.message || '注册成功！请现在登录。');
-            return true; // 返回成功状态
+            // 注册成功后返回成功状态和消息
+            const rawMessage = response.data.message || '注册成功！请现在登录。';
+            return {
+                success: true,
+                message: translateMessage(rawMessage)
+            };
         } catch (error) {
-            authError.value = error.response?.data?.message || error.message || '注册时发生未知错误';
-            console.error('Registration failed:', authError.value);
-            return false; // 返回失败状态
+            const rawErrorMessage = error.response?.data?.message || error.message || '注册时发生未知错误';
+            const translatedError = translateMessage(rawErrorMessage);
+            console.error('Registration failed:', translatedError);
+            // 注意：注册失败时不设置 authError，避免触发登录错误的 watch
+            // 注册错误由 handleRegister 中的 result.error 单独处理
+            return {
+                success: false,
+                error: translatedError
+            };
         }
     }
 
