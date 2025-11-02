@@ -157,13 +157,13 @@ export const useNotesStore = defineStore('notes', () => {
             }
 
             try {
-                await notesApi.permanentDelete(id)
+                await notesApi.delete(id)
             } catch (e) {
                 // 回滚
                 notes.value.splice(idx, 0, note)
                 if (wasActive) activeNoteId.value = id
                 alert(e?.response?.data?.message || '彻底删除失败')
-                console.error('Permanent delete note failed:', e)
+                console.error('Delete note failed:', e)
             }
         } else {
             // 正常删除：只标记 deletedAt，不调用后端
@@ -215,7 +215,7 @@ export const useNotesStore = defineStore('notes', () => {
         // 批量删除过期笔记（先删除后端，再删除本地）
         const deletePromises = expiredNotes.map(async (note) => {
             try {
-                await notesApi.permanentDelete(note.id)
+                await notesApi.delete(note.id)
                 // 后端删除成功后，从本地数组中移除
                 const idx = notes.value.findIndex(n => n.id === note.id)
                 if (idx > -1) {
@@ -223,7 +223,7 @@ export const useNotesStore = defineStore('notes', () => {
                 }
             } catch (e) {
                 // 如果后端删除失败，保留笔记（不删除本地数据）
-                console.error(`Failed to permanently delete note ${note.id}:`, e)
+                console.error(`Failed to delete expired note ${note.id}:`, e)
             }
         })
         
