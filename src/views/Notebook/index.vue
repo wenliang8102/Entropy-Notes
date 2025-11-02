@@ -1,13 +1,20 @@
 <script setup>
 import Sidebar from './Sidebar.vue'
 import NoteArea from './NoteArea.vue'
-import {ref} from "vue";
+import { ref, onMounted } from 'vue'
+import { useNotesStore } from '@/stores/notes'
 
-// 控制 Sidebar 折叠/展开
+
 const isSidebarCollapsed = ref(false)
 const toggleSidebar= ()=> {
   isSidebarCollapsed.value = !isSidebarCollapsed.value
 }
+
+
+const notesStore = useNotesStore()
+onMounted(() => {
+  notesStore.fetchNotes()
+})
 </script>
 
 <template>
@@ -20,16 +27,11 @@ const toggleSidebar= ()=> {
 <style scoped>
 .notebook {
   position: fixed;
-  inset: 0;           /* 等价于 top:0; right:0; bottom:0; left:0; */
+  inset: 0;
   display: flex;
   overflow: hidden;
 }
-
-.sidebar {
-
-}
-
-
+.sidebar {}
 .note-area {
   flex: 1;
   min-width: 0;
