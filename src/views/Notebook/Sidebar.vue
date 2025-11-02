@@ -17,13 +17,27 @@ const route = useRoute()
 // 静态菜单数据
 const menu = [
   { name: 'Home', label: '首页', icon: HomeOutlined },
-  { name: '', label: '设置', icon: SettingOutlined }
+  { name: '', label: '设置', icon: SettingOutlined },
+  { name: '', label: '回收站', icon: DeleteOutlined }
 ]
 
 
 const goRoute = (item) => {
-  if (item.name && route.name !== item.name) {
-    router.push({ name: item.name })
+  // 如果是回收站，切换视图模式（如果已经在回收站，则切回正常视图）
+  if (item.label === '回收站') {
+    if (notesStore.viewMode === 'trash') {
+      notesStore.setViewMode('notes')
+    } else {
+      notesStore.setViewMode('trash')
+    }
+  } else {
+    // 如果从回收站视图点击其他菜单项，切换回正常视图
+    if (notesStore.viewMode === 'trash') {
+      notesStore.setViewMode('notes')
+    }
+    if (item.name && route.name !== item.name) {
+      router.push({ name: item.name })
+    }
   }
 }
 
@@ -53,8 +67,8 @@ const {
     <ul class="menu">
       <li
           v-for="item in menu"
-          :key="item.name"
-          :class="{ active: route.name === item.name }"
+          :key="item.name || item.label"
+          :class="{ active: item.label === '回收站' ? notesStore.viewMode === 'trash' : route.name === item.name }"
           @click="goRoute(item)"
       >
         <span v-if="item.icon" class="icon">
@@ -64,8 +78,8 @@ const {
       </li>
     </ul>
 
-    <!-- 新建笔记按钮 -->
-    <div class="new-note-wrapper">
+    <!-- 新建笔记按钮（回收站视图下不显示） -->
+    <div class="new-note-wrapper" v-if="notesStore.viewMode !== 'trash'">
       <button class="new-note-btn" @click="handleCreateNote">
         <PlusOutlined />
         <span v-if="!isCollapsed">新建笔记</span>
@@ -73,7 +87,9 @@ const {
     </div>
 
     <!-- 笔记列表区 -->
-    <div class="notes-list-header" v-if="!isCollapsed">全部笔记</div>
+    <div class="notes-list-header" v-if="!isCollapsed">
+      {{ notesStore.viewMode === 'trash' ? '回收站' : '全部笔记' }}
+    </div>
     <ul class="notes-list">
       <li
           v-for="note in sortedNotes"

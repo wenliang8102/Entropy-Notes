@@ -1,6 +1,6 @@
 <script setup>
 import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
-import { onMounted, onBeforeUnmount, ref, watch, computed } from 'vue'
+import { onMounted, onBeforeUnmount, ref, watch, computed, nextTick } from 'vue'
 
 const props = defineProps({
   editor: { type: Object, required: true },
@@ -13,9 +13,10 @@ const filteredHeadings = computed(() =>
   (headings.value || []).filter(h => (h.text || '').trim().length > 0)
 )
 let observer = null
+let isInitialized = false
 
 const rebuildHeadings = () => {
-  if (!props.editor) return
+  if (!props.editor || !props.editor.view || !props.editor.view.dom) return
   const view = props.editor.view
   const dom = view.dom
   const list = []
@@ -35,8 +36,10 @@ const setupObserver = () => {
     observer.disconnect()
     observer = null
   }
-  if (headings.value.length === 0) return
+  if (headings.value.length === 0 || !props.editor || !props.editor.view || !props.editor.view.dom) return
   const rootEl = props.editor.view.dom.parentElement
+  if (!rootEl) return
+  
   observer = new IntersectionObserver((entries) => {
     const visible = entries
       .filter((e) => e.isIntersecting)
@@ -60,14 +63,62 @@ const handleClick = (heading) => {
   activeUid.value = heading.uid
 }
 
+// 初始化函数
+const initToc = () => {
+  if (!props.editor || !props.editor.view || !props.editor.view.dom) return
+  if (isInitialized) return // 避免重复初始化
+  
+  try {
+    props.editor.on('update', rebuildHeadings)
+    props.editor.on('create', rebuildHeadings)
+    isInitialized = true
+    // 等待 DOM 渲染完成后再重建
+    nextTick(() => {
+      setTimeout(() => {
+        rebuildHeadings()
+      }, 150)
+    })
+  } catch (e) {
+    console.warn('TOC initialization failed:', e)
+  }
+}
+
 onMounted(() => {
-  props.editor.on('update', rebuildHeadings)
-  rebuildHeadings()
+  initToc()
 })
 
+// 监听 editor 的变化，确保 editor 准备好后初始化
+watch(() => props.editor, (newEditor, oldEditor) => {
+  // 如果 editor 变化了，先清理旧的事件监听
+  if (oldEditor && isInitialized) {
+    try {
+      oldEditor.off('update', rebuildHeadings)
+      oldEditor.off('create', rebuildHeadings)
+      isInitialized = false
+    } catch (e) {
+      // 忽略清理错误
+    }
+  }
+  // 初始化新的 editor
+  if (newEditor && newEditor.view && newEditor.view.dom) {
+    initToc()
+  }
+}, { immediate: true })
+
 onBeforeUnmount(() => {
-  if (observer) observer.disconnect()
-  props.editor.off('update', rebuildHeadings)
+  if (observer) {
+    observer.disconnect()
+    observer = null
+  }
+  if (props.editor && isInitialized) {
+    try {
+      props.editor.off('update', rebuildHeadings)
+      props.editor.off('create', rebuildHeadings)
+      isInitialized = false
+    } catch (e) {
+      // 忽略清理错误
+    }
+  }
 })
 </script>
 

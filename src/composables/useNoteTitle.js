@@ -21,28 +21,11 @@ export function useNoteTitle(notesStore) {
         notesStore.updateActiveNote({ title: event.target.value })
     }
 
-    // 监听输入框失去焦点事件，进行重名检查
+    // 监听输入框失去焦点事件
     const handleTitleBlur = (event) => {
         const newTitle = event.target.value
-
-        // 检查是否与其他笔记重名
-        const isDuplicate = notesStore.notes.some(note =>
-            note.id !== notesStore.activeNoteId &&
-            note.title === newTitle
-        )
-
-        if (isDuplicate) {
-            // 如果重名，显示提示并恢复原始标题
-            alert('标题不能与其他笔记相同，请修改标题')
-            notesStore.updateActiveNote({ title: originalTitle.value })
-            // 恢复输入框的值并聚焦
-            event.target.value = originalTitle.value
-            event.target.focus()
-            event.target.select()
-        } else {
-            // 如果不重名，更新原始标题
-            originalTitle.value = newTitle
-        }
+        // 更新原始标题
+        originalTitle.value = newTitle
     }
 
     return {

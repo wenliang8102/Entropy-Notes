@@ -1,7 +1,7 @@
 <script setup>
 import Sidebar from './Sidebar.vue'
 import NoteArea from './NoteArea.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useNotesStore } from '@/stores/notes'
 
 
@@ -12,8 +12,24 @@ const toggleSidebar= ()=> {
 
 
 const notesStore = useNotesStore()
+
+// 设置定时器，每小时检查一次过期笔记
+let cleanupTimer = null
+
 onMounted(() => {
   notesStore.fetchNotes()
+  
+  // 每小时清理一次过期笔记（7天自动删除）
+  cleanupTimer = setInterval(async () => {
+    await notesStore.cleanupExpiredDeletedNotes()
+  }, 60 * 60 * 1000) // 1小时 = 60分钟 * 60秒 * 1000毫秒
+})
+
+onBeforeUnmount(() => {
+  if (cleanupTimer) {
+    clearInterval(cleanupTimer)
+    cleanupTimer = null
+  }
 })
 </script>
 
