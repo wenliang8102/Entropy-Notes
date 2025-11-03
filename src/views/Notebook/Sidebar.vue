@@ -72,10 +72,8 @@ const goRoute = (item) => {
           :class="{ active: item.label === '回收站' ? isTrashView : route.name === item.name }"
           @click="goRoute(item)"
       >
-        <span v-if="item.icon" class="icon">
-          <component :is="item.icon" />
-        </span>
-        <span v-if="!isCollapsed">{{ item.label }}</span>
+        <component :is="item.icon" class="icon" />
+        <span v-if="!isCollapsed" class="label">{{ item.label }}</span>
       </li>
     </ul>
 
@@ -83,7 +81,7 @@ const goRoute = (item) => {
     <div class="new-note-wrapper" v-if="!isTrashView">
       <button class="new-note-btn" @click="handleCreateNote">
         <PlusOutlined />
-        <span v-if="!isCollapsed">新建笔记</span>
+        <span v-if="!isCollapsed" class="label">新建笔记</span>
       </button>
     </div>
 
@@ -99,9 +97,7 @@ const goRoute = (item) => {
           @click="handleSelectNote(note.id)"
           :title="note.title"
       >
-        <span class="icon">
-          <BookOutlined />
-        </span>
+        <BookOutlined class="icon" />
         <div class="note-info" v-if="!isCollapsed">
           <span class="note-title">{{ note.title || '无标题笔记' }}</span>
           <span class="note-timestamp">{{ formatTimestamp(note.lastModified) }}</span>
@@ -167,7 +163,7 @@ const goRoute = (item) => {
 }
 
 /*保留图标，隐藏文字*/
-.sidebar.collapsed .new-note-btn span:nth-of-type(2) {
+.sidebar.collapsed .new-note-btn span.label {
   display: none;
 }
 
