@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { LeftOutlined, RightOutlined ,PlusOutlined, DeleteOutlined, HomeOutlined, SettingOutlined, BookOutlined} from '@ant-design/icons-vue'
+import { ToTopOutlined, PlusOutlined, DeleteOutlined, HomeOutlined, SettingOutlined, BookOutlined } from '@ant-design/icons-vue'
 import { useNotesStore } from '@/stores/notes'
 import { useSidebarNotes } from '@/composables/useSidebarNotes'
 import { useTrash } from '@/composables/useTrash'
@@ -60,8 +60,7 @@ const goRoute = (item) => {
   <div :class="['sidebar', { collapsed: isCollapsed }]">
     <!-- 折叠/展开按钮 -->
     <button class="toggle-btn" @click="emit('toggle')" type="button">
-      <RightOutlined v-if="isCollapsed" />
-      <LeftOutlined v-else />
+      <ToTopOutlined :style="{ transform: isCollapsed ? 'rotate(90deg)' : 'rotate(-90deg)' }" />
     </button>
 
     <!-- 功能菜单区 -->
@@ -282,6 +281,10 @@ const goRoute = (item) => {
   padding: 2px 8px;
   cursor: pointer;
   outline: none;
+}
+.toggle-btn :deep(svg) {
+  color: #000; /* 黑色图标 */
+  font-size: 16px; /* 与其他图标一致大小 */
 }
 .menu {
   list-style: none;

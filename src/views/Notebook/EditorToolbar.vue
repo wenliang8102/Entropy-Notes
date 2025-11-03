@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, toRef } from 'vue'
+import { defineProps, toRef, ref, onMounted, onBeforeUnmount } from 'vue'
 import { Dropdown, Menu, MenuItem } from 'ant-design-vue'
 import {
   CaretDownOutlined,
@@ -52,10 +52,109 @@ const { selectedColor, colorInputRef, applyColor, openColorPicker } = useTextCol
 const { fileInput, triggerFileInput, handleFileChange } = useImageUpload(editorRef)
 const { handleExport } = useNoteExport(editorRef, documentTitleRef)
 const { importFileInput, handleImport, handleImportFileChange } = useNoteImport(editorRef)
+
+// 工具栏拖拽横向滚动（仅在溢出时生效，且不影响按钮/下拉点击）
+const toolbarRef = ref(null)
+const isDragging = ref(false)
+let dragStartX = 0
+let lastClientX = 0
+let dragStartScrollLeft = 0
+let canScrollHorizontally = false
+let resizeObserver = null
+let activePointerId = null
+let pendingDrag = false
+const DRAG_THRESHOLD = 6
+let cancelNextClickOnce = null
+
+function updateCanScroll() {
+  const el = toolbarRef.value
+  if (!el) return
+  canScrollHorizontally = el.scrollWidth > el.clientWidth
+}
+
+function onPointerDown(e) {
+  const el = toolbarRef.value
+  if (!el) return
+  updateCanScroll()
+  if (!canScrollHorizontally) return
+  pendingDrag = true
+  isDragging.value = false
+  dragStartX = e.clientX
+  lastClientX = e.clientX
+  dragStartScrollLeft = el.scrollLeft
+  activePointerId = e.pointerId
+}
+
+function onPointerMove(e) {
+  const el = toolbarRef.value
+  if (!el) return
+  if (pendingDrag && !isDragging.value) {
+    const moved = Math.abs(e.clientX - dragStartX)
+    if (moved >= DRAG_THRESHOLD) {
+      isDragging.value = true
+      pendingDrag = false
+      try { el.setPointerCapture?.(activePointerId) } catch (_) {}
+      // 拖拽一旦激活，拦截下一次 click，避免按钮被误点
+      cancelNextClickOnce = function(ev) {
+        ev.stopPropagation()
+        ev.preventDefault()
+        window.removeEventListener('click', cancelNextClickOnce, true)
+        cancelNextClickOnce = null
+      }
+      window.addEventListener('click', cancelNextClickOnce, true)
+    } else {
+      return
+    }
+  }
+  if (!isDragging.value) return
+  e.preventDefault()
+  const deltaX = e.clientX - lastClientX
+  lastClientX = e.clientX
+  el.scrollLeft = el.scrollLeft - deltaX
+}
+
+function onPointerUp(e) {
+  const el = toolbarRef.value
+  if (!el) return
+  isDragging.value = false
+  pendingDrag = false
+  try { if (activePointerId != null) el.releasePointerCapture?.(activePointerId) } catch (_) {}
+  activePointerId = null
+}
+
+onMounted(() => {
+  updateCanScroll()
+  const el = toolbarRef.value
+  if (window?.ResizeObserver && el) {
+    resizeObserver = new ResizeObserver(() => updateCanScroll())
+    resizeObserver.observe(el)
+  } else {
+    window.addEventListener('resize', updateCanScroll)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (resizeObserver) {
+    try { resizeObserver.disconnect() } catch (_) {}
+    resizeObserver = null
+  } else {
+    window.removeEventListener('resize', updateCanScroll)
+  }
+})
 </script>
 
 <template>
-  <div class="toolbar" v-if="editor">
+  <div
+    class="toolbar"
+    :class="{ dragging: isDragging }"
+    ref="toolbarRef"
+    v-if="editor"
+    @pointerdown="onPointerDown"
+    @pointermove="onPointerMove"
+    @pointerup="onPointerUp"
+    @pointerleave="onPointerUp"
+    @pointercancel="onPointerUp"
+  >
     <!--多级标题 -->
     <Dropdown>
       <template #default>
@@ -276,13 +375,24 @@ const { importFileInput, handleImport, handleImportFileChange } = useNoteImport(
   padding: 8px;
   border-bottom: 1px solid #ececec;
   background: #fff;
+  overflow-x: auto; /* 仅在溢出时可横向滚动 */
+  -ms-overflow-style: none; /* IE/Edge 隐藏滚动条 */
+  scrollbar-width: none; /* Firefox 隐藏滚动条 */
+  touch-action: pan-y; /* 避免垂直滚动被拦截，仍允许横向拖拽 */
 }
+.toolbar::-webkit-scrollbar { display: none; } /* WebKit 隐藏滚动条 */
+.toolbar.dragging { cursor: grabbing; }
+.toolbar { cursor: default; }
 .toolbar .spacer {
   flex: 1;
 }
 .toolbar button {
   background: transparent;
   border: 1px solid transparent;
+  display: inline-flex; /* 保证图标与文字同一行 */
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap; /* 禁止换行，避免三角掉到下一行 */
 }
 .toolbar button:focus {
   outline: none;
