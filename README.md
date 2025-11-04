@@ -1,5 +1,110 @@
-# Vue 3 + Vite
+# Entropy Notes - 熵减笔记
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+**Entropy Notes** 是一款现代化的笔记应用程序，旨在通过“熵减”的理念，帮助用户整理思绪、优化内容，最终实现知识的有效赋能。项目基于 Vue 3、Vite 和 Pinia 构建，提供了一个美观、流畅且功能丰富的笔记体验。
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+[**在线体验 »**](http://8.138.220.50/)
+
+## 项目理念
+
+> 笔记熵减，知识赋能
+
+“熵”在信息论中代表不确定性或混乱程度。**Entropy Notes** 的核心理念是通过提供智能工具和优秀的设计，帮助用户降低笔记的“熵”，即减少混乱、提炼结构、增强可读性，从而使知识更易于理解、吸收和连接。
+
+## 主要功能
+
+- **用户认证**：提供安全的注册和登录功能。
+- **响应式侧边栏**： 
+  - 集成首页、设置、回收站等主要功能入口。
+  - 可折叠和展开，以适应不同屏幕空间需求。
+  - 动态显示笔记列表，并根据最后修改时间排序。
+  - 支持通过点击快速切换和预览笔记。
+- **大纲导航** ：
+  - 自动从笔记内容中提取标题，生成可点击的文档大纲。
+  - 方便用户在长篇笔记中快速跳转和定位。
+- **所见即所得编辑器**：基于 Tiptap 构建的强大富文本编辑器，支持： 
+  - 丰富的文本格式（标题、粗体、斜体、下划线、高亮等）。
+  - 任务列表 (Todo List)。
+  - 插入图片。
+  - 文本对齐和行高调整。
+- **笔记管理**： 
+  - 轻松创建、编辑、删除和查看笔记。
+  - 笔记列表按最后修改时间自动排序。
+- **笔记熵分析**： 
+  - 实时分析笔记内容的可读性和复杂度。
+  - 通过进度条和状态指示器直观反馈，帮助你优化表达。
+- **回收站机制**： 
+  - 删除的笔记将自动移入回收站，保留 7 天。
+  - 在保留期内，可以随时恢复或彻底删除笔记。
+
+## 技术栈
+
+### 前端 (`Entropy-Notes`)
+
+- **框架**: [Vue 3](https://vuejs.org/) (使用 `<script setup>` 语法)
+- **构建工具**: [Vite](https://vitejs.dev/)
+- **状态管理**: [Pinia](https://pinia.vuejs.org/)
+- **路由**: [Vue Router](https://router.vuejs.org/)
+- **UI 组件库**: [Ant Design Vue](https://www.antdv.com/)
+- **富文本编辑器**: [Tiptap](https://tiptap.dev/)
+- **HTTP 请求**: [Axios](https://axios-http.com/)
+
+### 后端 (`Entropy-Notes-backend`)
+
+项目后端由 `wenliang8102/Entropy-Notes-backend` 仓库提供支持。
+
+- **框架**: Node.js, Express
+- **数据库**: MongoDB
+- **认证**: JWT (JSON Web Tokens)
+
+## 快速开始
+
+1. **克隆项目到本地**
+
+   ```bash
+   git clone https://github.com/wenliang8102/Entropy-Notes.git
+   cd Entropy-Notes
+   ```
+
+2. **安装依赖**\
+   推荐使用 `pnpm`：
+
+   ```bash
+   pnpm install
+   ```
+
+   或者使用 `npm` 或 `yarn`：
+
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **运行开发服务器**
+
+   ```bash
+   pnpm dev
+   ```
+
+4. **打包构建**
+
+   ```bash
+   pnpm build
+   ```
+
+## 团队成员
+
+- **\[项目负责人\] - 温良**
+- **\[前端开发\] - 温良  刘禹麟**
+- **\[后端开发\] - 温良**
+- **\[产品经理\] - 温良 刘禹麟 马敏霞 张纤红**
+- **\[文档\] - 孟依灿 马敏霞 张纤红**
+- **\[部署/运维\] - 温良**
+
+## 致谢
+
+特别感谢 **[陈宇翔]** 老师，在项目的关键阶段为我们指明了方向，并提供了持续的推动力，确保了项目的最终完成。
+
+## 开源许可
+
+本项目采用 [MIT License](LICENSE) 开源许可。
