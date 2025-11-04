@@ -28,6 +28,7 @@ import {
   useFontSize,
   useNoteImport,
 } from '@/composables/useEditorCommands'
+import { useNotesStore } from '@/stores/notes'
 
 const props = defineProps({
   editor: {
@@ -43,7 +44,7 @@ const props = defineProps({
 
 const editorRef = toRef(props, 'editor')
 const documentTitleRef = toRef(props, 'documentTitle')
-
+const notesStore = useNotesStore()
 
 const blockTypes = useBlockTypes(editorRef)
 const alignTypes = useAlignTypes(editorRef)
@@ -51,7 +52,7 @@ const { applyFontSize } = useFontSize(editorRef)
 const { selectedColor, colorInputRef, applyColor, openColorPicker } = useTextColor(editorRef)
 const { fileInput, triggerFileInput, handleFileChange } = useImageUpload(editorRef)
 const { handleExport } = useNoteExport(editorRef, documentTitleRef)
-const { importFileInput, handleImport, handleImportFileChange } = useNoteImport(editorRef)
+const { importFileInput, handleImport, handleImportFileChange } = useNoteImport(editorRef, notesStore)
 
 // 工具栏拖拽横向滚动（仅在溢出时生效，且不影响按钮/下拉点击）
 const toolbarRef = ref(null)

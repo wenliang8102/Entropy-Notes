@@ -238,7 +238,7 @@ export function useFontSize(editorRef) {
 /**
  * 导入
  */
-export function useNoteImport(editorRef) {
+export function useNoteImport(editorRef, notesStore) {
     const importFileInput = ref(null)
 
     const handleImport = (acceptType) => {
@@ -251,6 +251,11 @@ export function useNoteImport(editorRef) {
     const handleImportFileChange = async (event) => {
         const file = event.target.files?.[0]
         if (!file || !editorRef.value) return
+
+        const newTitle = file.name.replace(/\.[^/.]+$/, "")
+        if (notesStore.activeNoteId) {
+            notesStore.updateActiveNote({ title: newTitle })
+        }
 
         const ext = file.name.split('.').pop().toLowerCase()
 
