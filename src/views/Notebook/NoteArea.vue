@@ -9,6 +9,7 @@ import { computed } from 'vue'
 import { analyzeEntropy } from '../../composables/useReadability.js'
 import { formatTimestamp } from '@/composables/useSidebarNotes'
 import { useTrash } from '@/composables/useTrash'
+import { useSettingsView } from '@/composables/useSettingsView'
 
 const notesStore = useNotesStore()
 
@@ -22,6 +23,12 @@ const {
   getExpiryClass,
   isTrashView,
 } = useTrash(notesStore)
+
+// 设置视图：相关UI状态与图标从 useSettingsView 集中提供
+const {
+  isSettingsView,
+  SettingsInlineRow,
+} = useSettingsView(notesStore)
 
 const jsonDoc = computed(() => notesStore.activeNote?.content ?? null)
 
@@ -107,15 +114,20 @@ const entropyLevelClass = computed(() => {
     </div>
   </div>
 
-  <!-- 正常笔记视图 -->
-  <div class="note-area" v-else-if="notesStore.activeNote">
+  <!-- 设置视图：由 useSettingsView 暴露的内联组件渲染（减少 NoteArea 代码） -->
+  <div v-else-if="isSettingsView" class="settings-view">
+    <SettingsInlineRow />
+  </div>
+
+  <!-- 正常笔记视图（仅未删除笔记可编辑） -->
+  <div class="note-area" v-else-if="notesStore.activeNote && !notesStore.activeNote.deletedAt">
     <!-- 文档标题框 -->
     <div class="title-wrapper">
       <div class="title-row">
-        <input
-            type="text"
-            class="document-title-input"
-            placeholder="请输入标题"
+      <input
+          type="text"
+          class="document-title-input"
+          placeholder="请输入标题"
             :key="notesStore.activeNote.id"
             :value="notesStore.activeNote.title"
             @input="handleTitleChange"
@@ -136,8 +148,17 @@ const entropyLevelClass = computed(() => {
     <EditorToolbar v-if="editor" :editor="editor" :document-title="notesStore.activeNote.title" />
 
     <div class="content-row">
-      <EditorContent :editor="editor" class="editor" />
+    <EditorContent :editor="editor" class="editor" />
       <TocSidebar v-if="editor" :editor="editor" />
+    </div>
+  </div>
+
+  <!-- 已删除但在正常视图：提示不可编辑 -->
+  <div class="note-area-empty" v-else-if="notesStore.activeNote && notesStore.activeNote.deletedAt">
+    <div class="empty-content">
+      <h2>该笔记位于回收站</h2>
+      <p>请先恢复该笔记后再进行编辑。</p>
+      <button @click="notesStore.restoreNote(notesStore.activeNote.id)" class="restore-btn">恢复笔记</button>
     </div>
   </div>
 
@@ -151,6 +172,11 @@ const entropyLevelClass = computed(() => {
 
 <style scoped>
 /* 样式保持不变 */
+.settings-theme-btn:focus {
+  outline: none;
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
 .note-area {
   display: flex;
   flex-direction: column;

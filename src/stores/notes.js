@@ -48,6 +48,12 @@ export const useNotesStore = defineStore('notes', () => {
         // 进入回收站时，清理过期笔记
         if (mode === 'trash') {
             await cleanupExpiredDeletedNotes()
+        } else if (mode === 'notes') {
+            // 切回正常视图时，如果当前激活的是已删除笔记，则切换到第一条未删除笔记
+            if (activeNote.value && activeNote.value.deletedAt) {
+                const firstNormal = notes.value.find(n => !n.deletedAt)
+                activeNoteId.value = firstNormal?.id || null
+            }
         }
     }
 

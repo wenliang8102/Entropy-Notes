@@ -78,4 +78,208 @@ button:focus-visible {
   }
 }
 
+/* 主题：深色（深蓝背景） */
+:root[data-theme="dark"] {
+  color: #ffffff;
+  background-color: #0f172a; /* 深蓝 */
+}
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] #app {
+  color: #ffffff;
+  background-color: #0f172a;
+}
 
+/* 侧边栏更深的蓝色 */
+:root[data-theme="dark"] .sidebar {
+  background: #0b1220;
+  border-right-color: #000000;
+}
+
+/* 主内容与编辑区域深蓝背景、白字 */
+:root[data-theme="dark"] .note-area,
+:root[data-theme="dark"] .trash-view,
+:root[data-theme="dark"] .editor {
+  background: #0f172a;
+  color: #ffffff;
+}
+:root[data-theme="dark"] .trash-header { background: #0b1220; }
+:root[data-theme="dark"] .note-area-empty { background: #0f172a; color: #cbd5e1; }
+:root[data-theme="dark"] .document-title-input {
+  color: #ffffff;
+}
+
+/* 工具栏深蓝背景，黑边改为黑色，图标与文字变白（蓝色保留原色） */
+:root[data-theme="dark"] .toolbar {
+  background: #0f172a;
+  border-bottom-color: #000000;
+}
+:root[data-theme="dark"] .toolbar button { color: #ffffff; }
+:root[data-theme="dark"] .toolbar :is(svg, .anticon) { color: #ffffff; }
+:root[data-theme="dark"] .toolbar button.active {
+  background: rgba(255,255,255,0.08); /* 更浅的深蓝 */
+  border-color: transparent;
+  color: #1890ff; /* 图标/文字仍为蓝色 */
+}
+:root[data-theme="dark"] .toolbar button.active :is(svg, .anticon) { color: #1890ff; }
+
+/* 分割线等细线改为黑色 */
+:root[data-theme="dark"] .title-wrapper { border-bottom-color: #000000; }
+:root[data-theme="dark"] .title-divider { background: #000000; }
+:root[data-theme="dark"] .trash-header { border-bottom-color: #000000; }
+:root[data-theme="dark"] .notes-list-header { color: #cbd5e1; }
+/* 回收站标题在深色主题下为白色，计数为与白天相同的灰色 */
+:root[data-theme="dark"] .trash-header h2 { color: #ffffff; }
+:root[data-theme="dark"] .trash-header .trash-count { color: #888; }
+
+/* 列表项悬停背景可略微变深蓝 */
+:root[data-theme="dark"] .notes-list li:hover { background: rgba(255,255,255,0.04); }
+:root[data-theme="dark"] .notes-list li.active { background: rgba(255,255,255,0.08); color: #1890ff; }
+:root[data-theme="dark"] .menu li:hover { background: rgba(255,255,255,0.04); }
+:root[data-theme="dark"] .menu li.active { background: rgba(255,255,255,0.08); color: #1890ff; }
+:root[data-theme="dark"] .toolbar button:hover { background: rgba(255,255,255,0.06); border-color: transparent; }
+/* 工具栏下拉菜单（深色样式，与笔记列表风格一致） */
+:root[data-theme="dark"] .ant-dropdown-menu {
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid #000000;
+}
+:root[data-theme="dark"] .ant-dropdown-menu-item,
+:root[data-theme="dark"] .ant-dropdown-menu-submenu-title {
+  color: #ffffff;
+}
+:root[data-theme="dark"] .ant-dropdown-menu-item:hover,
+:root[data-theme="dark"] .ant-dropdown-menu-submenu-title:hover {
+  background: rgba(255,255,255,0.04);
+}
+:root[data-theme="dark"] .ant-dropdown-menu-item-selected,
+:root[data-theme="dark"] .ant-dropdown-menu-item.active {
+  background: rgba(255,255,255,0.08);
+  color: #1890ff;
+}
+/* 避免切换设置视图时菜单项背景闪烁：禁用深色主题下的过渡 */
+:root[data-theme="dark"] .menu li { transition: none; }
+
+/* TOC 右侧导航（去白色，深色主题） */
+:root[data-theme="dark"] .toc { background: #0f172a; border-left-color: #000000; color: #e2e8f0; }
+:root[data-theme="dark"] .toc .toggle-btn { background: transparent; color: #91d5ff; }
+:root[data-theme="dark"] .toc .toggle-btn:hover { background: rgba(255,255,255,0.06); }
+:root[data-theme="dark"] .toc.collapsed .toggle-btn { background: transparent; }
+:root[data-theme="dark"] .toc.collapsed .toggle-btn:hover { background: rgba(255,255,255,0.08); }
+:root[data-theme="dark"] .toc .toggle-icon { color: #ffffff; }
+:root[data-theme="dark"] .toc .item:hover { background: rgba(255,255,255,0.04); color: inherit; }
+:root[data-theme="dark"] .toc .item.active { background: rgba(255,255,255,0.08); color: #1890ff; }
+
+:root[data-theme="dark"] .sidebar .toggle-btn { color: #ffffff; }
+:root[data-theme="dark"] .toggle-btn { background: transparent; border-color: transparent; }
+:root[data-theme="dark"] .toggle-btn:hover { background: rgba(255,255,255,0.06); }
+:root[data-theme="dark"] .sidebar.collapsed .toggle-btn { background: transparent; }
+:root[data-theme="dark"] .sidebar.collapsed .toggle-btn:hover { background: rgba(255,255,255,0.08); }
+
+/* 新建笔记下方分割线在深色主题改为黑色 */
+:root[data-theme="dark"] .sidebar .new-note-wrapper { border-bottom-color: #000000 !important; }
+
+/* 编辑区默认文字在暗色主题下使用白色（不影响用户自定义颜色） */
+:root[data-theme="dark"] .editor :deep(.ProseMirror) {
+  color: #ffffff;
+  text-shadow: none;
+}
+
+/* 右上可读性进度条：轨道为白色，已填充(左侧)为浅深蓝 */
+:root[data-theme="dark"] .readability-inline .rb-progress { background: #ffffff !important; }
+:root[data-theme="dark"] .readability-inline .rb-progress-bar { background: #27457a !important; }
+
+
+/* 新建笔记按钮：文字白色；hover/active 背景为浅深蓝 */
+:root[data-theme="dark"] .sidebar .new-note-btn {
+  color: #ffffff;
+  background: transparent;
+  border-color: transparent;
+}
+:root[data-theme="dark"] .sidebar .new-note-btn:hover {
+  background: rgba(255,255,255,0.04);
+  color: #1890ff;
+}
+:root[data-theme="dark"] .sidebar .new-note-btn:active,
+:root[data-theme="dark"] .sidebar .new-note-btn:focus-visible {
+  background: rgba(255,255,255,0.08);
+  outline: none;
+}
+
+/* 回收站卡片在深色主题下的悬浮/选中效果，和笔记列表一致 */
+:root[data-theme="dark"] .trash-view .trash-item { background: #0f172a; border-color: rgba(145,213,255,0.4); }
+:root[data-theme="dark"] .trash-view .trash-item:hover { background: rgba(255,255,255,0.04); border-color: #91d5ff; box-shadow: none; }
+:root[data-theme="dark"] .trash-view .trash-item.active { background: rgba(255,255,255,0.08); border-color: #1890ff; box-shadow: none; }
+:root[data-theme="dark"] .trash-view .trash-item .trash-item-title { color: #ffffff; }
+:root[data-theme="dark"] .trash-view .trash-item.active .trash-item-title { color: #1890ff; }
+
+/* 回收站操作按钮在深色主题下：背景同卡片，悬浮稍亮 */
+:root[data-theme="dark"] .trash-view .restore-btn,
+:root[data-theme="dark"] .trash-view .delete-btn {
+  background: transparent;
+  border-color: currentColor; /* 保留绿色/红色边框 */
+}
+:root[data-theme="dark"] .trash-view .restore-btn:hover,
+:root[data-theme="dark"] .trash-view .delete-btn:hover {
+  background: rgba(255,255,255,0.04);
+}
+:root[data-theme="dark"] .trash-view .restore-btn:active,
+:root[data-theme="dark"] .trash-view .delete-btn:active,
+:root[data-theme="dark"] .trash-view .restore-btn:focus-visible,
+:root[data-theme="dark"] .trash-view .delete-btn:focus-visible {
+  background: rgba(255,255,255,0.08);
+  outline: none;
+}
+
+/* 设置页容器与内容（明/暗主题） */
+.settings-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #ffffff;
+  color: #213547;
+}
+:root[data-theme="dark"] .settings-view {
+  background: #0f172a;
+  color: #ffffff;
+}
+.settings-inline-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 48px;
+}
+.settings-label {
+  font-size: 16px;
+  color: #213547;
+}
+:root[data-theme="dark"] .settings-label { color: #ffffff; }
+.settings-theme-btn {
+  border-radius: 6px;
+  width: 44px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+}
+.settings-theme-btn:focus,
+.settings-theme-btn:focus-visible { outline: none; box-shadow: none !important; }
+.settings-theme-btn::-moz-focus-inner { border: 0; }
+.settings-theme-btn[data-hover="true"] { border-color: transparent; box-shadow: none; }
+:root[data-theme="dark"] .settings-theme-btn {
+  background: #0f172a;
+  border: 1px solid transparent;
+}
+:root[data-theme="dark"] .settings-theme-btn:hover {
+  background: rgba(255,255,255,0.04);
+}
+:root[data-theme="dark"] .settings-theme-btn:active,
+:root[data-theme="dark"] .settings-theme-btn:focus-visible { background: rgba(255,255,255,0.08); outline: none; box-shadow: none !important; }
+
+/* 防止主题切换瞬间出现蓝色描边 */
+.settings-theme-btn { box-shadow: none; }
+/* 浅色主题下的悬浮/按下背景 */
+.settings-theme-btn:hover { background: #f5f5f5; }
+.settings-theme-btn:active { background: #eeeeee; }
