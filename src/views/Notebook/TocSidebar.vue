@@ -158,6 +158,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   align-items: flex-start;
 }
+.toc .toggle-btn { color: #999; }
 .toc.collapsed {
   width: 40px;
 }
@@ -188,7 +189,7 @@ onBeforeUnmount(() => {
   display: inline-block;
   font-size: 20px;
   font-weight: bold;
-  color: #999;
+  color: inherit; /* 跟随按钮颜色，便于主题切换统一控制 */
 }
 .toggle-icon.collapsed {
   transform: scaleX(-1) rotate(180deg);

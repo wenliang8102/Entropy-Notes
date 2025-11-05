@@ -5,6 +5,7 @@ import { ToTopOutlined, PlusOutlined, DeleteOutlined, HomeOutlined, SettingOutli
 import { useNotesStore } from '@/stores/notes'
 import { useSidebarNotes } from '@/composables/useSidebarNotes'
 import { useTrash } from '@/composables/useTrash'
+import { useSettingsView } from '@/composables/useSettingsView'
 
 
 const props = defineProps({
@@ -39,18 +40,32 @@ const {
   listHeader,
 } = useTrash(notesStore)
 
+// 设置视图相关
+const {
+  isSettingsView,
+  toggleSettingsView,
+  shouldHideSidebarNoteList,
+  shouldHideNewNoteButton,
+  isSettingsMenuActive,
+} = useSettingsView(notesStore)
+
 const goRoute = (item) => {
-  // 如果是回收站，切换视图模式（如果已经在回收站，则切回正常视图）
+  // 回收站切换
   if (item.label === '回收站') {
     toggleTrashView()
-  } else {
-    // 如果从回收站视图点击其他菜单项，切换回正常视图
-    if (isTrashView.value) {
-      notesStore.setViewMode('notes')
-    }
-    if (item.name && route.name !== item.name) {
-      router.push({ name: item.name })
-    }
+    return
+  }
+  // 设置切换
+  if (item.label === '设置') {
+    toggleSettingsView()
+    return
+  }
+  // 其它菜单项：确保退出回收站/设置视图
+  if (isTrashView.value || isSettingsView.value) {
+    notesStore.setViewMode('notes')
+  }
+  if (item.name && route.name !== item.name) {
+    router.push({ name: item.name })
   }
 }
 
@@ -68,7 +83,9 @@ const goRoute = (item) => {
       <li
           v-for="item in menu"
           :key="item.name || item.label"
-          :class="{ active: item.label === '回收站' ? isTrashView : route.name === item.name }"
+      :class="{ 
+        active: item.label === '回收站' ? isTrashView : (isSettingsMenuActive(item.label) || route.name === item.name)
+      }"
           @click="goRoute(item)"
       >
         <component :is="item.icon" class="icon" />
@@ -76,19 +93,19 @@ const goRoute = (item) => {
       </li>
     </ul>
 
-    <!-- 新建笔记按钮（回收站视图下不显示） -->
-    <div class="new-note-wrapper" v-if="!isTrashView">
+    <!-- 新建笔记按钮（回收站/设置视图下不显示） -->
+    <div class="new-note-wrapper" v-if="!isTrashView && !shouldHideNewNoteButton">
       <button class="new-note-btn" @click="handleCreateNote">
         <PlusOutlined />
         <span v-if="!isCollapsed" class="label">新建笔记</span>
       </button>
     </div>
 
-    <!-- 笔记列表区 -->
-    <div class="notes-list-header" v-if="!isCollapsed">
+    <!-- 笔记列表区（设置视图下隐藏） -->
+    <div class="notes-list-header" v-if="!isCollapsed && !shouldHideSidebarNoteList">
       {{ listHeader }}
     </div>
-    <ul class="notes-list">
+    <ul class="notes-list" v-if="!shouldHideSidebarNoteList">
       <li
           v-for="note in sortedNotes"
           :key="note.id"
@@ -282,8 +299,11 @@ const goRoute = (item) => {
   cursor: pointer;
   outline: none;
 }
+.toggle-btn {
+  color: #000; /* 默认浅色主题下为黑色 */
+}
 .toggle-btn :deep(svg) {
-  color: #000; /* 黑色图标 */
+  color: currentColor; /* 跟随按钮本身颜色，便于主题切换统一控制 */
   font-size: 16px; /* 与其他图标一致大小 */
 }
 .menu {
