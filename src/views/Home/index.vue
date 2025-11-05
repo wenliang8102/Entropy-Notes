@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { notification } from 'ant-design-vue'
@@ -60,12 +60,25 @@ import { translateMessage } from '@/utils/translator'
 const router = useRouter()
 const authStore = useAuthStore()
 
+
 // 表单数据
 const formData = ref({
   username: '',
   password: '',
   rememberPassword: false
 })
+
+onMounted(() => {
+  const savedUsername = localStorage.getItem('entropy-notes-username');
+  const savedPassword = localStorage.getItem('entropy-notes-password');
+  if(savedUsername){
+    formData.value.username = savedUsername;
+  }
+  if (savedPassword) {
+    formData.value.password = savedPassword;
+    formData.value.rememberPassword = true;
+  }
+});
 
 // 显示通知的函数
 const showNotification = (type, message, description) => {
@@ -95,6 +108,12 @@ async function handleLogin() {
   }
   const result = await authStore.login(formData.value.username, formData.value.password)
   if (result?.success) {
+    localStorage.setItem('entropy-notes-username', formData.value.username);
+    if (formData.value.rememberPassword) {
+      localStorage.setItem('entropy-notes-password', formData.value.password);
+    } else {
+      localStorage.removeItem('entropy-notes-password');
+    }
     showNotification('success', '登录成功', '正在跳转...')
     // 延迟跳转，让用户看到成功提示
     setTimeout(() => {
@@ -306,9 +325,10 @@ function handleNoAccount() {
 /* 表单选项 */
 .form-options {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin: 1.5vh 0 0.5vh 0;
+  gap: 1.5vw;
 }
 
 .checkbox-label {
