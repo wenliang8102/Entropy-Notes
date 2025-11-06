@@ -135,7 +135,7 @@ const goRoute = (item) => {
 /* 样式保持不变 */
 .sidebar {
   width: 200px;
-  transition: width 0.3s;
+  transition: width 0.3s, background-color 0.3s ease, border-right-color 0.3s ease;
   background: #f7f7fa;
   border-right: 1px solid #ececec;
   box-sizing: border-box;
@@ -152,7 +152,8 @@ const goRoute = (item) => {
 .new-note-wrapper {
   padding: 8px 16px;
   border-bottom: 1px solid #ececec;
-  margin-top: 20px; /* 与“设置”之间预留20px距离 */
+  margin-top: 20px; /* 与"设置"之间预留20px距离 */
+  transition: border-bottom-color 0.3s ease;
 }
 .new-note-btn {
   width: 100%;
@@ -167,7 +168,7 @@ const goRoute = (item) => {
   justify-content: center;
   gap: 8px;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.1s ease;
 }
 .new-note-btn:focus {
   outline: none; /* 清除浏览器默认的焦点边框 */
@@ -176,6 +177,10 @@ const goRoute = (item) => {
   background: #e6f7ff;
   border: 1px solid #91d5ff;
   color: #1890ff;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.new-note-btn:active {
+  transition: background-color 0.2s ease;
 }
 
 /*保留图标，隐藏文字*/
@@ -199,6 +204,7 @@ const goRoute = (item) => {
   white-space: nowrap;      /* 强制文字不换行（关键） */
   overflow: hidden;         /* 超出宽度的部分隐藏（避免溢出） */
   text-overflow: ellipsis;  /* 超出部分显示省略号（可选，更美观） */
+  transition: color 0.1s ease;
 }
 
 
@@ -240,6 +246,7 @@ const goRoute = (item) => {
   white-space: nowrap;      /* 强制文字不换行（关键） */
   overflow: hidden;         /* 超出宽度的部分隐藏（避免溢出） */
   text-overflow: ellipsis;  /* 超出部分显示省略号（可选，更美观） */
+  transition: color 0.1s ease;
 }
 
 .notes-list li.active .note-timestamp {
@@ -255,11 +262,14 @@ const goRoute = (item) => {
   align-items: center;
   padding: 10px 20px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background-color 0.3s ease, color 0.1s ease;
   user-select: none;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.notes-list li:hover {
+  transition: background-color 0.2s ease;
 }
 .notes-list li .note-title {
   overflow: hidden;
@@ -268,6 +278,7 @@ const goRoute = (item) => {
   white-space: nowrap;      /* 强制文字不换行（关键） */
   flex: 1; /* 占据剩余空间 */
   min-width: 0; /* 允许收缩 */
+  transition: color 0.1s ease;
 }
 .notes-list li.active {
   background: #e6f7ff;
@@ -290,6 +301,14 @@ const goRoute = (item) => {
 .sidebar.collapsed .notes-list li span:not(.icon) {
   display: none;
 }
+.sidebar.collapsed .toggle-btn {
+  background: transparent;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.1s ease;
+}
+.sidebar.collapsed .toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  transition: background-color 0.2s ease;
+}
 
 
 .toggle-btn {
@@ -298,13 +317,19 @@ const goRoute = (item) => {
   padding: 2px 8px;
   cursor: pointer;
   outline: none;
-}
-.toggle-btn {
+  background: transparent;
+  border: 1px solid transparent;
   color: #000; /* 默认浅色主题下为黑色 */
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.1s ease;
+}
+.toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  transition: background-color 0.2s ease;
 }
 .toggle-btn :deep(svg) {
   color: currentColor; /* 跟随按钮本身颜色，便于主题切换统一控制 */
   font-size: 16px; /* 与其他图标一致大小 */
+  transition: color 0.1s ease;
 }
 .menu {
   list-style: none;
@@ -316,8 +341,11 @@ const goRoute = (item) => {
   align-items: center;
   padding: 12px 20px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background-color 0.3s ease, color 0.1s ease;
   user-select: none;
+}
+.menu li:hover {
+  transition: background-color 0.2s ease;
 }
 .menu li.active {
   background: #e6f7ff;
@@ -339,11 +367,13 @@ const goRoute = (item) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.1s ease;
 }
 
 .icon :deep(svg) {
   font-size: 16px;
   color: #1890ff;
+  transition: color 0.1s ease;
 }
 
 /* 菜单文字布局优化 */
@@ -351,6 +381,7 @@ const goRoute = (item) => {
   white-space: nowrap;      /* 强制文字不换行（关键） */
   overflow: hidden;         /* 超出宽度的部分隐藏（避免溢出） */
   text-overflow: ellipsis;  /* 超出部分显示省略号（可选，更美观） */
+  transition: color 0.1s ease;
 }
 .sidebar.collapsed .icon {
   margin-right: 0;

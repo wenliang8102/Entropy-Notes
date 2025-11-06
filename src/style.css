@@ -156,8 +156,10 @@ button:focus-visible {
   background: rgba(255,255,255,0.08);
   color: #1890ff;
 }
-/* 避免切换设置视图时菜单项背景闪烁：禁用深色主题下的过渡 */
-:root[data-theme="dark"] .menu li { transition: none; }
+/* 菜单项在深色主题下保持颜色过渡 */
+:root[data-theme="dark"] .menu li { 
+  transition: background-color 0.3s ease, color 0.1s ease;
+}
 
 /* TOC 右侧导航（去白色，深色主题） */
 :root[data-theme="dark"] .toc { background: #0f172a; border-left-color: #000000; color: #e2e8f0; }
@@ -169,11 +171,28 @@ button:focus-visible {
 :root[data-theme="dark"] .toc .item:hover { background: rgba(255,255,255,0.04); color: inherit; }
 :root[data-theme="dark"] .toc .item.active { background: rgba(255,255,255,0.08); color: #1890ff; }
 
-:root[data-theme="dark"] .sidebar .toggle-btn { color: #ffffff; }
-:root[data-theme="dark"] .toggle-btn { background: transparent; border-color: transparent; }
-:root[data-theme="dark"] .toggle-btn:hover { background: rgba(255,255,255,0.06); }
-:root[data-theme="dark"] .sidebar.collapsed .toggle-btn { background: transparent; }
-:root[data-theme="dark"] .sidebar.collapsed .toggle-btn:hover { background: rgba(255,255,255,0.08); }
+:root[data-theme="dark"] .sidebar .toggle-btn { 
+  color: #ffffff;
+  background: transparent !important;
+  border-color: transparent !important;
+}
+:root[data-theme="dark"] .toggle-btn { 
+  background: transparent !important; 
+  border-color: transparent !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.1s ease;
+}
+:root[data-theme="dark"] .toggle-btn:hover { 
+  background: rgba(255,255,255,0.06) !important; 
+  transition: background-color 0.2s ease;
+}
+:root[data-theme="dark"] .sidebar.collapsed .toggle-btn { 
+  background: transparent !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.1s ease;
+}
+:root[data-theme="dark"] .sidebar.collapsed .toggle-btn:hover { 
+  background: rgba(255,255,255,0.08) !important;
+  transition: background-color 0.2s ease;
+}
 
 /* 新建笔记下方分割线在深色主题改为黑色 */
 :root[data-theme="dark"] .sidebar .new-note-wrapper { border-bottom-color: #000000 !important; }
@@ -187,6 +206,9 @@ button:focus-visible {
 /* 右上可读性进度条：轨道为白色，已填充(左侧)为浅深蓝 */
 :root[data-theme="dark"] .readability-inline .rb-progress { background: #ffffff !important; }
 :root[data-theme="dark"] .readability-inline .rb-progress-bar { background: #27457a !important; }
+:root[data-theme="dark"] .readability-inline { color: #cbd5e1; }
+/* 字数显示在深色模式下的颜色 */
+:root[data-theme="dark"] .word-count { color: #cbd5e1; }
 
 
 /* 新建笔记按钮：文字白色；hover/active 背景为浅深蓝 */
@@ -237,10 +259,16 @@ button:focus-visible {
   height: 100%;
   background: #ffffff;
   color: #213547;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 :root[data-theme="dark"] .settings-view {
   background: #0f172a;
   color: #ffffff;
+}
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 .settings-inline-row {
   display: flex;
@@ -251,6 +279,7 @@ button:focus-visible {
 .settings-label {
   font-size: 16px;
   color: #213547;
+  transition: color 0.3s ease;
 }
 :root[data-theme="dark"] .settings-label { color: #ffffff; }
 .settings-theme-btn {
@@ -283,3 +312,65 @@ button:focus-visible {
 /* 浅色主题下的悬浮/按下背景 */
 .settings-theme-btn:hover { background: #f5f5f5; }
 .settings-theme-btn:active { background: #eeeeee; }
+
+/* 账户信息区域 */
+.settings-account-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.settings-username {
+  font-size: 16px;
+  color: #213547;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+:root[data-theme="dark"] .settings-username {
+  color: #ffffff;
+}
+
+/* 退出登录按钮 */
+.settings-logout-btn {
+  padding: 8px 20px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #213547;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  outline: none;
+}
+.settings-logout-btn:hover {
+  background: #f5f5f5;
+  border-color: #ff4d4f;
+  color: #ff4d4f;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.settings-logout-btn:active {
+  background: #eeeeee;
+  transition: background 0.2s;
+}
+.settings-logout-btn:focus {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.1);
+}
+:root[data-theme="dark"] .settings-logout-btn {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+:root[data-theme="dark"] .settings-logout-btn:hover {
+  background: rgba(255, 77, 79, 0.1);
+  border-color: #ff4d4f;
+  color: #ff4d4f;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+:root[data-theme="dark"] .settings-logout-btn:active {
+  background: rgba(255, 77, 79, 0.2);
+  transition: background 0.2s;
+}
+:root[data-theme="dark"] .settings-logout-btn:focus {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+}
