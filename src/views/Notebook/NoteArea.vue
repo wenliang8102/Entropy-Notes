@@ -65,6 +65,23 @@ const entropyLevelClass = computed(() => {
   return 'red'
 })
 
+// 计算字数
+const wordCount = computed(() => {
+  try {
+    const textFromJson = jsonDoc.value ? extractTextFromDoc(jsonDoc.value) : ''
+    const fallbackText = editor.value?.getText?.() || ''
+    const text = textFromJson && textFromJson.trim() ? textFromJson : fallbackText
+    // 计算总字符数（去除空格）
+    const totalChars = text.replace(/\s/g, '').length
+    return {
+      total: totalChars,
+      display: totalChars > 0 ? `${totalChars} 字` : '0 字'
+    }
+  } catch (e) {
+    return { total: 0, display: '0 字' }
+  }
+})
+
 </script>
 
 <template>
@@ -134,6 +151,7 @@ const entropyLevelClass = computed(() => {
             @blur="handleTitleBlur"
         />
         <span class="title-divider"></span>
+        <div class="word-count">{{ wordCount.display }}</div>
         <div class="readability-inline" title="笔记可读性">
           <div class="rb-progress">
             <div class="rb-progress-bar" :style="{ width: entropyInfo.progress + '%' }"></div>
@@ -216,6 +234,13 @@ const entropyLevelClass = computed(() => {
   width: 1px;
   align-self: stretch;
   background: #ececec;
+}
+
+/* 字数显示 */
+.word-count {
+  font-size: 14px;
+  color: #6b7280;
+  white-space: nowrap;
 }
 
 /* 右侧可读性纯文字区域 */
