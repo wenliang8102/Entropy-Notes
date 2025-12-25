@@ -16,6 +16,7 @@ export default defineConfig({
       protocolImports: true,
     }),
   ],
+  base: './',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

@@ -9,7 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons-svg": "^4.4.2",
     "@ant-design/icons-vue": "^7.0.1",
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
     "@tiptap/core": "^3.7.2",
     "@tiptap/extension-color": "^3.7.2",
     "@tiptap/extension-font-family": "^3.7.0",

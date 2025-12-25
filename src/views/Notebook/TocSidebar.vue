@@ -8,7 +8,7 @@ const props = defineProps({
 
 const headings = ref([]) // [{ uid, el, level, text }]
 const activeUid = ref('')
-const isCollapsed = ref(false)
+const isCollapsed = ref(true)
 const filteredHeadings = computed(() =>
   (headings.value || []).filter(h => (h.text || '').trim().length > 0)
 )

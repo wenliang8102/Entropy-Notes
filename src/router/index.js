@@ -1,5 +1,5 @@
 // src/router/index.js
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router'; // 1. 引入 createWebHashHistory
 import Home from '@/views/Home/index.vue'
 import Notebook from '@/views/Notebook/index.vue'
 
@@ -17,7 +17,7 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(), // 2. 使用 Hash 模式
     routes
 });
 

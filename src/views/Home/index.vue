@@ -306,7 +306,7 @@ function handleNoAccount() {
 
 .form-input {
   flex: 1;
-  height: 4.5vh;
+  height: 2.5vh;
   border: 1.5px solid #E0E0E0;
   border-radius: 1vh;
   padding: 0 1.2vw;
@@ -407,6 +407,7 @@ function handleNoAccount() {
 /* 响应式调整 */
 @media (max-width: 768px) {
   .login-form-container {
+    left: 50%;
     min-width: 65vw;
     max-width: 75vw;
     top: 60%;

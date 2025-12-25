@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Entropy Notes</string>
+    <string name="title_activity_main">Entropy Notes</string>
+    <string name="package_name">com.entropy.notes</string>
+    <string name="custom_url_scheme">com.entropy.notes</string>
+</resources>
